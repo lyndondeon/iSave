@@ -14,7 +14,10 @@
 
     <main class="login-layout">
 
-        <!-- LEFT PANEL -->
+        <!-- =================================
+         LEFT BRAND PANEL
+        ================================== -->
+
         <section class="brand-panel">
 
             <div class="brand-header">
@@ -84,7 +87,9 @@
         </section>
 
 
-        <!-- RIGHT PANEL -->
+        <!-- =================================
+         RIGHT BRAND PANEL
+        ================================== -->
         <section class="form-panel">
 
             <div class="form-container">
@@ -194,21 +199,38 @@
                     <!-- LOGIN BUTTON -->
                     <button
                         type="submit"
-                        class="submit-button"
-                        onclick="window.location.href='dashboard.html'"
-                    >
-                        <span>Sign In</span>
-                        <span class="button-arrow">→</span>
+                        class="login-button"
+                        id="loginButton">
+
+                        <span>Log In</span>
+                        <span class="button-right-arrow">→</span>
                     </button>
 
+                    <br>
+
+                    <!-- CREATE ACCOUNT BUTTON -->
+                    <button
+                        type="button"
+                        class="signin-button"
+                        onclick="window.location.href='createaccount.html'">
+
+                        <span class="button-left-arrow">←</span>
+                        <span>Create Account</span>
+                    </button>
 
                     <!-- STATUS MESSAGE -->
                     <div
                         class="login-message"
                         id="loginMessage"
                         role="status"
-                        aria-live="polite"
-                    ></div>
+                        aria-live="polite"></div>
+
+                    <!-- STATUS MESSAGE -->
+                    <div
+                        class="login-message"
+                        id="loginMessage"
+                        role="status"
+                        aria-live="polite"></div>
 
                 </form>
 
@@ -241,54 +263,8 @@
     </main>
 
 
-    <script>
-
-        // SHOW / HIDE PASSWORD
-
-        const passwordInput =
-            document.getElementById("password");
-
-        const togglePassword =
-            document.getElementById("togglePassword");
-
-        togglePassword.addEventListener("click", () => {
-
-            const hidden =
-                passwordInput.type === "password";
-
-            passwordInput.type =
-                hidden ? "text" : "password";
-
-            togglePassword.textContent =
-                hidden ? "Hide" : "Show";
-
-            togglePassword.setAttribute(
-                "aria-label",
-                hidden ? "Hide password" : "Show password"
-            );
-
-        });
-
-
-        // LOGIN FORM PLACEHOLDER
-
-        document.getElementById("loginForm")
-            .addEventListener("submit", (event) => {
-
-                event.preventDefault();
-
-                const message =
-                    document.getElementById("loginMessage");
-
-                message.textContent =
-                    "Authentication is not yet connected.";
-
-                message.className =
-                    "login-message info";
-
-            });
-
-    </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="Script.js"></script>
 
 </body>
 </html>
