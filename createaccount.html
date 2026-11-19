@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 <!DOCTYPE html>
 <html lang="en">
@@ -376,3 +377,383 @@
 
 </body>
 </html>
+=======
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Create Account | iSave</title>
+
+    <link rel="stylesheet" href="login.css">
+</head>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="Script.js"></script>
+
+<body>
+
+<div class="login-layout">
+
+    <!-- =================================
+         LEFT BRAND PANEL
+    ================================== -->
+
+    <section class="brand-panel">
+
+        <div class="brand-header">
+            <div class="brand-icon">i</div>
+
+            <div class="brand-text">
+                <h1>iSave</h1>
+                <span>PERSONAL FINANCE</span>
+            </div>
+        </div>
+
+        <div class="brand-content">
+
+            <span class="brand-eyebrow">JOIN ISAVE</span>
+
+            <h2>Start building better financial habits.</h2>
+
+            <p>
+                Create your personal account and take control
+                of your income, expenses, and savings.
+            </p>
+
+            <div class="brand-features">
+
+                <div class="feature-item">
+                    <div class="feature-icon">✓</div>
+                    <div>
+                        <h3>Personalized Account</h3>
+                        <p>Your own space to manage your finances.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">₱</div>
+                    <div>
+                        <h3>Track Your Money</h3>
+                        <p>Keep your financial records organized.</p>
+                    </div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">↗</div>
+                    <div>
+                        <h3>Achieve Your Goals</h3>
+                        <p>Build better saving habits every day.</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="brand-footer">
+            <span>© 2026 iSave</span>
+            <span>Personal Finance Management</span>
+        </div>
+
+    </section>
+
+
+    <!-- =================================
+         RIGHT FORM PANEL
+    ================================== -->
+
+    <main class="form-panel">
+
+        <div class="form-container signup-container">
+
+            <!-- MOBILE BRAND -->
+
+            <div class="mobile-brand">
+                <div class="brand-icon">i</div>
+
+                <div>
+                    <h1>iSave</h1>
+                </div>
+            </div>
+
+
+            <!-- FORM HEADING -->
+
+            <div class="form-heading">
+
+                <span class="form-eyebrow">CREATE ACCOUNT</span>
+
+                <h2>Get started.</h2>
+
+                <p>
+                    Fill in your information below to create
+                    your personal iSave account.
+                </p>
+
+            </div>
+
+
+            <!-- REGISTRATION FORM -->
+
+            <form id="createAccountForm">
+
+                <div class="signup-grid">
+
+                    <!-- FIRST NAME -->
+
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+
+                        <input
+                            type="text"
+                            id="firstName"
+                            name="FirstName"
+                            placeholder="Enter your first name"
+                            autocomplete="given-name"
+                            required
+                        >
+                    </div>
+
+
+                    <!-- LAST NAME -->
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+
+                        <input
+                            type="text"
+                            id="lastName"
+                            name="LastName"
+                            placeholder="Enter your last name"
+                            autocomplete="family-name"
+                            required
+                        >
+                    </div>
+
+
+                    <!-- AGE -->
+
+                    <div class="form-group">
+                        <label for="age">Age</label>
+
+                        <input
+                            type="number"
+                            id="age"
+                            name="Age"
+                            placeholder="Enter your age"
+                            min="1"
+                            required
+                        >
+                    </div>
+
+
+                    <!-- BIRTHDAY -->
+
+                    <div class="form-group">
+                        <label for="birthday">Birthday</label>
+
+                        <input
+                            type="date"
+                            id="birthday"
+                            name="Birthday"
+                            required
+                        >
+                    </div>
+
+
+                    <!-- COMPANY -->
+
+                    <div class="form-group">
+                        <label for="company">Company</label>
+
+                        <input
+                            type="text"
+                            id="company"
+                            name="Company"
+                            placeholder="Enter your company"
+                            autocomplete="organization"
+                            required
+                        >
+                    </div>
+
+
+                    <!-- POSITION -->
+
+                    <div class="form-group">
+                        <label for="position">Position</label>
+
+                        <input
+                            type="text"
+                            id="position"
+                            name="Position"
+                            placeholder="Enter your position"
+                            required
+                        >
+                    </div>
+
+                    <!-- EMAIL -->
+
+                    <div class="form-group full-width">
+                        <label for="email">Email</label>
+
+                        <input
+                            type="email"
+                            id="email"
+                            name="Email"
+                            placeholder="Enter your email"
+                            autocomplete="email"
+                            required> This will be your account username.
+                        </small>
+                    </div>
+
+                    <!-- USERNAME -->
+
+                    <div class="form-group full-width">
+                        <label for="username">Username</label>
+
+                        <input
+                            type="text"
+                            id="username"
+                            name="Username"
+                            placeholder="Choose a username"
+                            autocomplete="username"
+                            required
+                        >
+
+                        <small>
+                            This will be your account username.
+                        </small>
+                    </div>
+
+
+                    <!-- PASSWORD -->
+
+                    <div class="form-group full-width">
+                        <label for="password">Password</label>
+
+                        <div class="password-field">
+                            <input
+                                type="password"
+                                id="password"
+                                name="Password"
+                                placeholder="Create a password"
+                                autocomplete="new-password"
+                                required>
+
+                            <button
+                                type="button"
+                                id="togglePassword">
+                                SHOW
+                            </button>
+                        </div>
+
+                        <small>
+                            Choose a strong and secure password.
+                        </small>
+                    </div>
+
+                    <!-- CONFIRM PASSWORD -->
+
+                    <div class="form-group full-width">
+                        <label for="confirmPassword">Confirm Password</label>
+
+                        <div class="password-field">
+                            <input
+                                type="password"
+                                id="confirmPassword"
+                                name="ConfirmPassword"
+                                placeholder="Re-enter your password"
+                                autocomplete="new-password"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                id="toggleConfirmPassword">
+                                SHOW
+                            </button>
+                        </div>
+
+                        <small>
+                            Re-enter your password to confirm.
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <!-- CREATE ACCOUNT BUTTON -->
+
+                <button
+                    type="submit"
+                    class="signin-button create-account-button"
+                    id="createAccountButton">
+
+                    <span>Create Account</span>
+                    <span class="button-right-arrow">→</span>
+                </button>
+
+
+                <!-- LOGIN LINK -->
+
+                <div class="account-link">
+                    Already have an account?
+                    <a href="index.html">Login here</a>
+                </div>
+
+            </form>
+
+
+            <!-- SECURITY NOTICE -->
+
+            <div class="security-notice">
+
+                <div class="security-icon">✓</div>
+
+                <div>
+                    <strong>Your information matters.</strong>
+
+                    <p>
+                        Your account information should be handled
+                        securely and kept private.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <!-- FOOTER -->
+
+            <div class="form-footer">
+                © 2026 iSave. All rights reserved.
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+<!-- PASSWORD VISIBILITY -->
+
+<script>
+    const passwordInput = document.getElementById("password");
+    const togglePassword = document.getElementById("togglePassword");
+
+    togglePassword.addEventListener("click", function () {
+
+        const isPassword = passwordInput.type === "password";
+
+        passwordInput.type = isPassword ? "text" : "password";
+
+        togglePassword.textContent = isPassword ? "HIDE" : "SHOW";
+
+    });
+</script>
+
+</body>
+</html>
+>>>>>>> v0.0.2
