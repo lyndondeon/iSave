@@ -590,6 +590,369 @@ body.sidebar-open {
     border-top: 1px solid var(--border);
 }
 
+
+/* =================================
+   TRANSACTION MODAL OVERLAY
+================================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 20px;
+
+    background: rgba(20, 35, 25, 0.55);
+    backdrop-filter: blur(3px);
+}
+
+.modal-overlay.active {
+    display: flex;
+}
+
+/* =================================
+   TRANSACTION MODAL
+================================= */
+
+.transaction-modal {
+    width: 100%;
+    max-width: 520px;
+    max-height: 90vh;
+
+    overflow-y: auto;
+
+    background: var(--surface);
+    border-radius: 16px;
+
+    padding: 28px;
+
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18);
+
+    animation: modalFadeIn 0.2s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* =================================
+   MODAL HEADER
+================================= */
+
+.modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    margin-bottom: 25px;
+}
+
+.modal-header h2 {
+    margin: 0 0 6px;
+
+    color: var(--text);
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.modal-header p {
+    margin: 0;
+
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.modal-close {
+    width: 32px;
+    height: 32px;
+
+    border: none;
+    border-radius: 8px;
+
+    background: var(--background);
+    color: var(--text-secondary);
+
+    font-size: 24px;
+    line-height: 1;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.modal-close:hover {
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+}
+
+/* =================================
+   FORM FIELDS
+================================= */
+
+#transactionForm {
+    display: flex;
+    flex-direction: column;
+    gap: 17px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 12px 13px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: #fff;
+    color: var(--text);
+
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+
+    outline: none;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(71, 118, 83, 0.10);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #a5b0a7;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* =================================
+   DATE TOGGLE
+================================= */
+
+.date-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.date-hint {
+    margin: -3px 0 2px;
+
+    color: var(--text-secondary);
+    font-size: 11px;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+
+    width: 38px;
+    height: 21px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    inset: 0;
+
+    background: #cbd5cc;
+    border-radius: 20px;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.toggle-slider::before {
+    content: "";
+
+    position: absolute;
+    width: 15px;
+    height: 15px;
+
+    left: 3px;
+    top: 3px;
+
+    background: white;
+    border-radius: 50%;
+
+    transition: 0.2s;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background: var(--primary);
+}
+
+.toggle-switch input:checked + .toggle-slider::before {
+    transform: translateX(17px);
+}
+
+/* =================================
+   AMOUNT FIELD
+================================= */
+
+.amount-input-wrapper {
+    position: relative;
+}
+
+.amount-input-wrapper > span {
+    position: absolute;
+    left: 13px;
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.amount-input-wrapper input {
+    padding-left: 32px;
+}
+
+
+/* =================================
+   TRANSACTION TYPE DROPDOWN
+================================= */
+
+.form-group select {
+    width: 100%;
+    box-sizing: border-box;
+
+    padding: 12px 13px;
+
+    border: 1px solid var(--border);
+    border-radius: 8px;
+
+    background: #fff;
+    color: var(--text);
+
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+
+    outline: none;
+    cursor: pointer;
+
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.form-group select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(71, 118, 83, 0.10);
+}
+
+
+/* =================================
+   MODAL ACTIONS
+================================= */
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+
+    margin-top: 8px;
+}
+
+.cancel-btn,
+.save-transaction-btn {
+    padding: 11px 18px;
+
+    border: none;
+    border-radius: 8px;
+
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.cancel-btn {
+    background: var(--background);
+    color: var(--text-secondary);
+}
+
+.cancel-btn:hover {
+    background: var(--border);
+}
+
+.save-transaction-btn {
+    background: var(--primary);
+    color: white;
+}
+
+.save-transaction-btn:hover {
+    background: var(--primary-dark);
+}
+
+/* =================================
+   RESPONSIVE MODAL
+================================= */
+
+@media screen and (max-width: 480px) {
+
+    .modal-overlay {
+        padding: 12px;
+    }
+
+    .transaction-modal {
+        padding: 22px 18px;
+        max-height: 92vh;
+    }
+
+    .modal-header h2 {
+        font-size: 18px;
+    }
+
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .cancel-btn,
+    .save-transaction-btn {
+        width: 100%;
+        padding: 13px;
+    }
+
+}
+
+
 /* =================================
    TABLETS AND SMALL LAPTOPS
 ================================= */

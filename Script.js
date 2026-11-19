@@ -818,8 +818,6 @@ function setupLogin() {
 // key   = pangalan ng column sa Supabase
 // label = ipapakita sa user (gamit sa mobile view)
 const TRANSACTION_COLUMNS = [
-    { key: "id",         label: "ID" },
-    { key: "created_at", label: "Logs" },
     { key: "Date",       label: "Date" },
     { key: "Payroll",    label: "Payroll" },
     { key: "Sender",     label: "Sender" },
@@ -839,16 +837,22 @@ function showTableMessage(tableBody, text) {
 
 }
 
-// Kunin ang transactions at ilagay sa table
-async function loadTransactions(tableBody) {
+
+// =====================================
+// LOAD USER'S OWN TRANSACTIONS
+// =====================================
+
+async function loadTransactions(tableBody, userId) {
 
     const { data, error } = await db
         .from("Transactions")
-        .select("*");
+        .select("*")
+        .eq("UserID", userId)
+        .order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    if (data.length === 0) {
+    if (!data || data.length === 0) {
         showTableMessage(tableBody, "No transactions found.");
         return;
     }
@@ -876,6 +880,7 @@ async function loadTransactions(tableBody) {
 
 }
 
+
 function setupDashboard() {
 
     const tableBody = document.getElementById("transactionTableBody");
@@ -898,7 +903,7 @@ function setupDashboard() {
                 return;
             }
 
-            await loadTransactions(tableBody);
+            await loadTransactions(tableBody, data.session.user.id);
 
         } catch (error) {
 
@@ -925,4 +930,265 @@ document.addEventListener("DOMContentLoaded", function () {
     setupCreateAccount();
     setupDashboard();
 
+});
+
+
+
+
+// =====================================
+// ADD TRANSACTION MODAL
+// =====================================
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const addTransactionBtn = document.getElementById("addTransactionBtn");
+    const transactionModal = document.getElementById("transactionModal");
+
+    const closeTransactionModal = document.getElementById("closeTransactionModal");
+    const cancelTransaction = document.getElementById("cancelTransaction");
+
+    const transactionForm = document.getElementById("transactionForm");
+
+    const todayDateToggle = document.getElementById("todayDateToggle");
+    const transactionDate = document.getElementById("transactionDate");
+    const dateHint = document.getElementById("dateHint");
+
+
+    // =====================================
+    // GET TODAY'S DATE
+    // =====================================
+
+    function getTodayDate() {
+
+        const today = new Date();
+
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+        const day = String(today.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+    }
+
+
+    // =====================================
+    // OPEN MODAL
+    // =====================================
+
+    function openTransactionModal() {
+
+        transactionModal.classList.add("active");
+
+        document.body.style.overflow = "hidden";
+
+        // Default: Today's date
+        todayDateToggle.checked = true;
+
+        transactionDate.value = getTodayDate();
+        transactionDate.disabled = true;
+
+        dateHint.textContent = "Automatically using today's date.";
+    }
+
+
+    // =====================================
+    // CLOSE MODAL
+    // =====================================
+
+    function closeModal() {
+
+        transactionModal.classList.remove("active");
+
+        document.body.style.overflow = "";
+
+        transactionForm.reset();
+
+        // Restore default date settings
+        todayDateToggle.checked = true;
+        transactionDate.value = getTodayDate();
+        transactionDate.disabled = true;
+
+        dateHint.textContent = "Automatically using today's date.";
+    }
+
+
+    // =====================================
+    // BUTTON EVENTS
+    // =====================================
+
+    addTransactionBtn.addEventListener("click", openTransactionModal);
+
+    closeTransactionModal.addEventListener("click", closeModal);
+
+    cancelTransaction.addEventListener("click", closeModal);
+
+
+    // =====================================
+    // DATE TOGGLE
+    // =====================================
+
+    todayDateToggle.addEventListener("change", function () {
+
+        if (this.checked) {
+
+            // Automatic today's date
+            transactionDate.value = getTodayDate();
+            transactionDate.disabled = true;
+
+            dateHint.textContent = "Automatically using today's date.";
+
+        } else {
+
+            // Allow manual date selection
+            transactionDate.disabled = false;
+
+            dateHint.textContent = "Select your preferred transaction date.";
+
+        }
+
+    });
+
+
+    // =====================================
+    // CLOSE WHEN CLICKING OUTSIDE
+    // =====================================
+
+    transactionModal.addEventListener("click", function (event) {
+
+        if (event.target === transactionModal) {
+            closeModal();
+        }
+
+    });
+
+
+    // =====================================
+    // CLOSE USING ESCAPE KEY
+    // =====================================
+
+    document.addEventListener("keydown", function (event) {
+
+        if (
+            event.key === "Escape" &&
+            transactionModal.classList.contains("active")
+        ) {
+            closeModal();
+        }
+
+    });
+
+
+    
+    // =====================================
+    // SAVE TRANSACTION TO SUPABASE
+    // =====================================
+
+    transactionForm.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const saveButton = transactionForm.querySelector(
+            ".save-transaction-btn"
+        );
+
+        try {
+
+            // =====================================
+            // CHECK CURRENT USER
+            // =====================================
+
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
+
+            const { data: userData, error: userError } =
+                await db.auth.getUser();
+
+            if (userError) {
+                throw userError;
+            }
+
+            const user = userData.user;
+
+            if (!user) {
+                alert("Your session has expired. Please log in again.");
+                window.location.href = "index.html";
+                return;
+            }
+
+
+            // =====================================
+            // GET FORM VALUES
+            // =====================================
+
+            const transactionData = {
+
+                "Date": todayDateToggle.checked
+                    ? getTodayDate()
+                    : transactionDate.value,
+
+                "Payroll": Number(
+                    document.getElementById("payroll").value
+                ),
+
+                "Sender": document.getElementById("sender").value.trim(),
+
+                "Amount": Number(
+                    document.getElementById("amount").value
+                ),
+
+                "Reciever": document.getElementById("receiver").value.trim(),
+
+                "Purpose": document.getElementById("purpose").value.trim(),
+
+                "Transaction": document.getElementById("transactionType").value
+
+                // Do not manually add UserID.
+                // Supabase uses auth.uid() as the column default.
+            };
+
+
+            // =====================================
+            // INSERT INTO SUPABASE
+            // =====================================
+
+            const { data, error } = await db
+                .from("Transactions")
+                .insert([transactionData])
+                .select();
+
+            if (error) {
+                throw error;
+            }
+
+
+            // =====================================
+            // SUCCESS
+            // =====================================
+
+            console.log("Transaction saved:", data);
+
+            alert("Transaction successfully saved!");
+
+            closeModal();
+
+            // Reload dashboard to show the new record
+            window.location.reload();
+
+
+        } catch (error) {
+
+            console.error("Save Transaction Error:", error);
+
+            alert(
+                "Unable to save transaction:\n\n" +
+                error.message
+            );
+
+        } finally {
+
+            saveButton.disabled = false;
+            saveButton.textContent = "Save Transaction";
+
+        }
+
+    });
 });
