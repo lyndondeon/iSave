@@ -307,63 +307,6 @@ body.sidebar-open {
     color: rgba(71,118,83,.18);
 }
 
-/* =================================
-   CONNECTION PANEL
-================================= */
-
-.connection-panel {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 17px 22px;
-    margin-bottom: 22px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-}
-
-.connection-info {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-}
-
-.connection-info p {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-
-.connection-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.status-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #d69b39;
-}
-
-.connect-button {
-    border: none;
-    border-radius: 9px;
-    padding: 12px 20px;
-    background: var(--primary);
-    color: white;
-    font-size: 12px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: .2s ease;
-}
-
-.connect-button:hover {
-    background: var(--primary-dark);
-}
 
 /* =================================
    SUMMARY CARDS
@@ -448,6 +391,52 @@ body.sidebar-open {
     color: var(--text-secondary);
 }
 
+.table-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    width: auto;
+}
+
+.add-transaction-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    padding: 11px 18px;
+
+    border: none;
+    border-radius: 9px;
+
+    background: var(--primary);
+    color: white;
+
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+    transition: all .2s ease;
+}
+
+.add-transaction-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(36, 75, 53, .15);
+}
+
+.add-transaction-btn:active {
+    transform: translateY(0);
+}
+
+.add-icon {
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1;
+}
+
 .record-count {
     padding: 10px 14px;
     border-radius: 9px;
@@ -498,6 +487,7 @@ body.sidebar-open {
     color: var(--text-secondary) !important;
     padding: 40px !important;
 }
+
 
 /* =================================
    TABLE FOOTER
@@ -925,6 +915,16 @@ body.sidebar-open {
     .database-header p {
         font-size: 10px;
     }
+
+    .table-actions {
+        width: 100%;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .add-transaction-btn {
+        padding: 10px 14px;
+        font-size: 11px;
 
     .record-count {
         font-size: 10px;

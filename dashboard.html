@@ -148,12 +148,21 @@
                         <p>Your personal financial records</p>
                     </div>
 
-                    <div class="table-actions">
-                        <span class="record-count">
-                            <span class="record-icon">▤</span>
-                            All Records
-                        </span>
-                    </div>
+                    <!-- ADD TRANSACTION BUTTON -->
+                    <button
+                        type="button"
+                        id="addTransactionBtn"
+                        class="add-transaction-btn">
+
+                        <span class="add-icon">+</span>
+                        Add Transaction
+                    </button>
+
+                    <!-- RECORD COUNT -->
+                    <span class="record-count">
+                        <span class="record-icon">▤</span>
+                        All Records
+                    </span>
                 </div>
 
                 <div class="table-wrapper">
@@ -211,6 +220,8 @@
 
     </div>
 </div>
+
+
 
 <!-- EXISTING LIBRARIES AND SCRIPT -->
 <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
