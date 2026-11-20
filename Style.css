@@ -1,47 +1,121 @@
+/* =====================================================
+   iSave - DASHBOARD STYLES
+   =====================================================
+   Contents:
+    1.  Font and theme colors
+    2.  Base styles
+    3.  Page layout
+    4.  Sidebar
+    5.  Top bar
+    6.  Overview (welcome + balance)
+    7.  Summary cards
+    8.  Transactions table
+    9.  Savings note
+    10. Footer
+    11. Buttons
+    12. Add transaction modal
+    13. Form fields
+    14. Responsive: laptops (1100px and below)
+    15. Responsive: tablets (960px and below)
+    16. Responsive: phones (720px and below)
+    17. Responsive: small phones (400px and below)
+    18. Reduced motion
+   ===================================================== */
+
+
+/* =====================================================
+   1. FONT AND THEME COLORS
+   ===================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 :root {
+    /* Theme colors (same as the original design) */
     --primary: #477653;
     --primary-dark: #365d40;
     --brand-dark: #244b35;
     --brand-soft: #dcebdd;
+    --brand-tint: #edf5ee;
     --background: #f5f8f5;
     --surface: #ffffff;
     --text: #273b2c;
     --text-secondary: #7b8b7e;
+    --text-on-dark: #d6e5d9;
+    --text-on-dark-muted: #b6cdb9;
     --border: #e6ece6;
     --success: #4b9564;
+    --danger: #b4483c;
+    --danger-soft: #f6e4e1;
+
+    /* Sizes */
+    --sidebar-width: 248px;
+    --radius-lg: 18px;
+    --radius-md: 12px;
+    --radius-sm: 9px;
 }
 
-* {
+
+/* =====================================================
+   2. BASE STYLES
+   ===================================================== */
+
+*,
+*::before,
+*::after {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 html {
-    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
 }
 
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Inter', system-ui, sans-serif;
     background: var(--background);
     color: var(--text);
+    line-height: 1.5;
     overflow-x: hidden;
 }
 
-body.sidebar-open {
+/* Stops the page from scrolling while the menu or modal is open */
+body.no-scroll {
     overflow: hidden;
 }
 
-/* =================================
-   MAIN LAYOUT
-================================= */
+button,
+input,
+select,
+textarea {
+    font: inherit;
+    color: inherit;
+}
 
-.app-container {
+button {
+    cursor: pointer;
+}
+
+svg {
+    display: block;
+    flex-shrink: 0;
+}
+
+/* Visible outline when using the keyboard */
+:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+
+/* =====================================================
+   3. PAGE LAYOUT
+   ===================================================== */
+
+.app {
     display: flex;
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 .main-area {
@@ -51,644 +125,657 @@ body.sidebar-open {
     flex-direction: column;
 }
 
-/* =================================
-   SIDEBAR
-================================= */
-
-.sidebar {
-    width: 245px;
-    min-width: 245px;
-    background: var(--brand-dark);
-    color: white;
+.main-content {
+    width: 100%;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 28px 32px 36px;
     display: flex;
     flex-direction: column;
-    padding: 25px 18px;
-    position: relative;
-    z-index: 1002;
+    gap: 22px;
 }
 
-.sidebar-brand {
+
+/* =====================================================
+   4. SIDEBAR
+   ===================================================== */
+
+.sidebar {
+    position: sticky;
+    top: 0;
+    width: var(--sidebar-width);
+    height: 100vh;
+    height: 100dvh;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 16px;
+    overflow-y: auto;
+    background: var(--brand-dark);
+    color: #ffffff;
+}
+
+/* Brand row */
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px 22px;
+    margin-bottom: 18px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.brand {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 0 8px 25px;
 }
 
 .brand-logo {
-    width: 48px;
-    height: 48px;
-    background: var(--brand-soft);
-    color: var(--brand-dark);
-    border-radius: 13px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 30px;
-    font-weight: 800;
-    flex-shrink: 0;
-}
-
-.brand-name h1 {
-    font-size: 23px;
+    border-radius: 12px;
+    background: var(--brand-soft);
+    color: var(--brand-dark);
+    font-size: 26px;
     font-weight: 800;
 }
 
-.brand-name span {
-    font-size: 9px;
-    color: #b6cdb9;
-    letter-spacing: 1.3px;
+.brand-name {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
 }
 
-.sidebar-divider {
-    height: 1px;
-    background: rgba(255,255,255,.2);
-    margin-bottom: 28px;
+/* Close button (small screens only) */
+.close-sidebar {
+    display: none;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
 }
 
+.close-sidebar:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* Navigation links */
 .sidebar-nav {
     display: flex;
     flex-direction: column;
-    gap: 9px;
+    gap: 6px;
 }
 
 .nav-link {
+    width: 100%;
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 15px;
-    color: #d6e5d9;
-    text-decoration: none;
-    border-radius: 12px;
-    font-size: 13px;
+    gap: 12px;
+    padding: 12px 14px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: transparent;
+    color: var(--text-on-dark);
+    font-size: 14px;
     font-weight: 600;
-    transition: .2s ease;
+    text-align: left;
+    text-decoration: none;
+    transition: background 0.2s, color 0.2s;
 }
 
-.nav-link span {
-    font-size: 21px;
-    width: 23px;
-    text-align: center;
+.nav-link svg {
+    width: 20px;
+    height: 20px;
 }
 
-.nav-link:hover,
+.nav-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
 .nav-link.active {
     background: var(--brand-soft);
     color: var(--brand-dark);
 }
 
-.sidebar-quote {
-    margin-top: auto;
-    padding: 20px 8px 5px;
-    border-top: 1px solid rgba(255,255,255,.2);
+.sidebar .nav-link:focus-visible,
+.close-sidebar:focus-visible {
+    outline-color: var(--brand-soft);
 }
 
-.sidebar-quote p {
+/* Bottom part: log out + quote */
+.sidebar-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.sidebar-quote {
+    padding: 0 8px;
     color: #c6d9c9;
     font-size: 13px;
     font-style: italic;
-    line-height: 1.8;
+    line-height: 1.7;
 }
 
-/* =================================
-   MOBILE SIDEBAR CONTROLS
-================================= */
+/* Dark background behind the sidebar (small screens only) */
+.sidebar-backdrop {
+    display: none;
+}
 
-.mobile-menu-header {
+
+/* =====================================================
+   5. TOP BAR
+   ===================================================== */
+
+.topbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    min-height: 72px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    width: 100%;
+    gap: 14px;
+    padding: 12px 32px;
+    background: rgba(245, 248, 245, 0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
 }
 
-.hamburger-menu {
+/* Menu button (small screens only) */
+.hamburger {
     display: none;
     width: 42px;
     height: 42px;
-    border: none;
-    background: transparent;
-    border-radius: 9px;
-    flex-direction: column;
+    align-items: center;
     justify-content: center;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
     flex-shrink: 0;
-    transition: background .2s ease;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--brand-dark);
 }
 
-.hamburger-menu:hover {
-    background: rgba(255,255,255,.12);
+.hamburger:hover {
+    background: var(--brand-tint);
 }
 
-.hamburger-menu span {
-    display: block;
-    width: 23px;
-    height: 2px;
-    background: white;
-    border-radius: 5px;
-    transition: .25s ease;
+.page-title {
+    flex: 1;
+    min-width: 0;
 }
 
-.close-sidebar {
-    display: none;
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 9px;
-    background: rgba(255,255,255,.12);
-    color: white;
-    font-size: 29px;
-    line-height: 1;
-    cursor: pointer;
-    transition: .2s ease;
+.page-title h1 {
+    color: var(--brand-dark);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.3px;
+    line-height: 1.2;
 }
 
-.close-sidebar:hover {
-    background: rgba(255,255,255,.22);
+.page-title p {
+    color: var(--text-secondary);
+    font-size: 12px;
 }
 
-/* =================================
-   NAVBAR
-================================= */
-
-.navbar {
-    width: 100%;
-    min-height: 85px;
-    background: var(--brand-dark);
-    color: white;
-    padding: 0 35px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.header-label,
-.eyebrow {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.4px;
-    color: var(--primary);
-}
-
-.header-label {
-    color: #b6cdb9;
-}
-
-.header-title h2 {
-    font-size: 19px;
-    margin-top: 5px;
-}
-
-.nav-right {
+.topbar-right {
     display: flex;
     align-items: center;
-    gap: 18px;
+    gap: 12px;
 }
 
 .system-label {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    color: var(--text-secondary);
     font-size: 12px;
-    color: #c7d8ca;
+    font-weight: 500;
+    white-space: nowrap;
 }
 
 .user-avatar {
     width: 40px;
     height: 40px;
-    background: rgba(255,255,255,.15);
-    border: 1px solid rgba(255,255,255,.2);
-    border-radius: 50%;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 50%;
+    background: var(--brand-dark);
+    color: #ffffff;
+    font-size: 15px;
     font-weight: 700;
 }
 
-/* =================================
-   MAIN CONTENT
-================================= */
 
-.main-content {
-    width: 100%;
-    max-width: 1600px;
-    margin: auto;
-    padding: 30px;
-}
+/* =====================================================
+   6. OVERVIEW (WELCOME + BALANCE)
+   ===================================================== */
 
-/* =================================
-   WELCOME BANNER
-================================= */
-
-.welcome-banner {
-    min-height: 155px;
-    padding: 35px 45px;
-    background: linear-gradient(110deg, #dcebdd, #edf5ee);
-    border: 1px solid #d4e5d6;
-    border-radius: 17px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.overview {
+    position: relative;
     overflow: hidden;
-    margin-bottom: 22px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 24px;
+    padding: 32px 36px;
+    border-radius: var(--radius-lg);
+    background: var(--brand-dark);
+    color: #ffffff;
 }
 
-.welcome-banner h2 {
-    font-size: clamp(25px, 3vw, 37px);
-    margin: 12px 0 8px;
-    color: var(--brand-dark);
-    letter-spacing: -1.2px;
+/* Coin-like ring in the corner (decoration only) */
+.overview::after {
+    content: "";
+    position: absolute;
+    top: -90px;
+    right: -70px;
+    width: 280px;
+    height: 280px;
+    border: 38px solid rgba(220, 235, 221, 0.07);
+    border-radius: 50%;
+    pointer-events: none;
 }
 
-.welcome-banner p {
-    color: #65836c;
-    font-size: 15px;
+.overview-text,
+.overview-balance {
+    position: relative;
+    z-index: 1;
 }
 
-.welcome-decoration {
-    font-size: 90px;
-    color: rgba(71,118,83,.18);
+.overview-date {
+    margin-bottom: 6px;
+    color: var(--text-on-dark-muted);
+    font-size: 13px;
+}
+
+.overview h2 {
+    font-size: clamp(24px, 3vw, 34px);
+    font-weight: 800;
+    letter-spacing: -1px;
+    line-height: 1.15;
+}
+
+.overview-tagline {
+    margin-top: 6px;
+    color: #c7d8ca;
+    font-size: 14px;
+}
+
+.overview-balance {
+    text-align: right;
+}
+
+.overview-balance span {
+    color: var(--text-on-dark-muted);
+    font-size: 13px;
+}
+
+.overview-balance strong {
+    display: block;
+    margin: 2px 0 4px;
+    font-size: clamp(30px, 4vw, 44px);
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1.5px;
+    line-height: 1.1;
+}
+
+.overview-balance small {
+    color: var(--brand-soft);
+    font-size: 12px;
 }
 
 
-/* =================================
-   SUMMARY CARDS
-================================= */
+/* =====================================================
+   7. SUMMARY CARDS
+   ===================================================== */
 
 .summary-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
-    margin-bottom: 24px;
 }
 
 .summary-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 15px;
-    padding: 23px 18px;
     display: flex;
     align-items: center;
-    gap: 15px;
-    box-shadow: 0 3px 12px rgba(36,75,53,.035);
+    gap: 14px;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
 }
 
 .summary-icon {
-    width: 47px;
-    height: 47px;
+    width: 44px;
+    height: 44px;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
     background: var(--brand-soft);
     color: var(--brand-dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 22px;
-    font-weight: 700;
 }
 
-.summary-card span {
+.summary-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.summary-icon.is-expense {
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+.summary-label {
     color: var(--text-secondary);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
 }
 
-.summary-card h3 {
-    font-size: 19px;
-    margin: 7px 0 5px;
-    color: var(--text);
+.summary-value {
+    margin: 2px 0;
+    font-size: 20px;
+    font-weight: 800;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.3;
 }
 
-.summary-card small {
-    font-size: 10px;
+.summary-hint {
     color: var(--success);
+    font-size: 11px;
 }
 
-/* =================================
-   DATABASE TABLE
-================================= */
 
-.database-section {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 16px;
+/* =====================================================
+   8. TRANSACTIONS TABLE
+   ===================================================== */
+
+.transactions {
     overflow: hidden;
-    box-shadow: 0 3px 12px rgba(36,75,53,.035);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
 }
 
-.database-header {
-    padding: 23px 25px;
+.transactions-header {
     display: flex;
+    align-items: center;
     justify-content: space-between;
-    align-items: center;
-    gap: 15px;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--border);
 }
 
-.database-header h3 {
+.transactions-header h3 {
     font-size: 18px;
-    margin: 7px 0 5px;
+    font-weight: 800;
 }
 
-.database-header p {
-    font-size: 12px;
+.transactions-header p {
     color: var(--text-secondary);
-}
-
-.table-actions {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    width: auto;
-}
-
-.add-transaction-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 9px;
-
-    padding: 11px 18px;
-
-    border: none;
-    border-radius: 9px;
-
-    background: var(--primary);
-    color: white;
-
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-
-    cursor: pointer;
-    transition: all .2s ease;
-}
-
-.add-transaction-btn:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(36, 75, 53, .15);
-}
-
-.add-transaction-btn:active {
-    transform: translateY(0);
-}
-
-.add-icon {
-    font-size: 19px;
-    font-weight: 500;
-    line-height: 1;
-}
-
-.record-count {
-    padding: 10px 14px;
-    border-radius: 9px;
-    background: var(--background);
-    color: var(--primary-dark);
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.record-icon {
-    margin-right: 7px;
+    font-size: 13px;
 }
 
 .table-wrapper {
     width: 100%;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
 }
 
-.data-grid {
+.data-table {
     width: 100%;
     border-collapse: collapse;
+}
+
+.data-table th {
+    padding: 13px 20px;
+    background: var(--brand-tint);
+    color: var(--brand-dark);
+    font-size: 12px;
+    font-weight: 700;
+    text-align: left;
     white-space: nowrap;
 }
 
-.data-grid th {
+.data-table td {
     padding: 15px 20px;
-    text-align: left;
-    background: #edf5ee;
-    color: var(--brand-dark);
-    font-size: 11px;
-    font-weight: 700;
-}
-
-.data-grid td {
-    padding: 16px 20px;
     border-bottom: 1px solid var(--border);
-    font-size: 12px;
-    color: var(--text);
+    font-size: 13px;
+    vertical-align: top;
 }
 
-.data-grid tbody tr:hover {
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
     background: #f8fbf8;
 }
 
-.empty-state {
-    text-align: center;
-    color: var(--text-secondary) !important;
-    padding: 40px !important;
+/* Column styles (classes are added by script.js) */
+.cell-date,
+.cell-payroll {
+    white-space: nowrap;
 }
 
+.data-table .cell-amount {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+    white-space: nowrap;
+}
 
-/* =================================
-   TABLE FOOTER
-================================= */
-
-.table-footer {
-    padding: 17px 22px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 11px;
+.data-table td.cell-purpose {
+    min-width: 220px;
     color: var(--text-secondary);
 }
 
-.pagination {
-    display: flex;
-    gap: 6px;
+/* "No transactions found", "Loading...", errors */
+.data-table td.empty-state {
+    padding: 48px 20px;
+    color: var(--text-secondary);
+    text-align: center;
 }
 
-.pagination button {
-    width: 30px;
-    height: 30px;
-    border: 1px solid var(--border);
-    border-radius: 7px;
-    background: white;
-    color: var(--text);
-    cursor: pointer;
-}
 
-.pagination .page-active {
-    background: var(--primary);
-    color: white;
-    border-color: var(--primary);
-}
+/* =====================================================
+   9. SAVINGS NOTE
+   ===================================================== */
 
-/* =================================
-   SAVINGS BANNER
-================================= */
-
-.savings-banner {
-    margin-top: 22px;
-    padding: 22px 25px;
-    background: #e8f2e9;
-    border: 1px solid #d4e5d6;
-    border-radius: 15px;
+.savings-note {
     display: flex;
     align-items: center;
-    gap: 17px;
+    gap: 16px;
+    padding: 20px 24px;
+    border: 1px solid #d4e5d6;
+    border-radius: var(--radius-md);
+    background: var(--brand-tint);
 }
 
 .savings-icon {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border-radius: 50%;
     background: var(--brand-dark);
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 29px;
-    flex-shrink: 0;
+    color: #ffffff;
 }
 
-.savings-text {
-    flex: 1;
+.savings-icon svg {
+    width: 22px;
+    height: 22px;
 }
 
-.savings-text h3 {
-    font-size: 14px;
-    margin-bottom: 5px;
+.savings-note h3 {
+    font-size: 15px;
+    font-weight: 700;
 }
 
-.savings-text p {
-    font-size: 11px;
+.savings-note p {
     color: var(--text-secondary);
+    font-size: 13px;
 }
 
-.savings-tag {
-    background: white;
-    color: var(--primary-dark);
-    padding: 10px 14px;
-    border-radius: 8px;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: .5px;
-}
 
-/* =================================
-   FOOTER
-================================= */
+/* =====================================================
+   10. FOOTER
+   ===================================================== */
 
 .footer {
-    padding: 20px 30px;
     margin-top: auto;
     display: flex;
     justify-content: space-between;
-    gap: 10px;
-    color: var(--text-secondary);
-    font-size: 10px;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    padding: 18px 32px;
     border-top: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 12px;
 }
 
 
-/* =================================
-   TRANSACTION MODAL OVERLAY
-================================= */
+/* =====================================================
+   11. BUTTONS
+   ===================================================== */
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.2;
+    white-space: nowrap;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.button svg {
+    width: 18px;
+    height: 18px;
+}
+
+.button-primary {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+.button-primary:hover {
+    background: var(--primary-dark);
+}
+
+.button-secondary {
+    border-color: var(--border);
+    background: var(--surface);
+    color: var(--text);
+}
+
+.button-secondary:hover {
+    background: var(--background);
+}
+
+.button:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   12. ADD TRANSACTION MODAL
+   ===================================================== */
 
 .modal-overlay {
     position: fixed;
     inset: 0;
-    z-index: 9999;
-
-    display: none;
+    z-index: 1000;
+    display: flex;
     align-items: center;
     justify-content: center;
-
     padding: 20px;
-
     background: rgba(20, 35, 25, 0.55);
     backdrop-filter: blur(3px);
 }
 
-.modal-overlay.active {
-    display: flex;
+/* The "hidden" attribute hides the modal */
+.modal-overlay[hidden] {
+    display: none;
 }
-
-/* =================================
-   TRANSACTION MODAL
-================================= */
 
 .transaction-modal {
     width: 100%;
-    max-width: 520px;
-    max-height: 90vh;
-
-    overflow-y: auto;
-
+    max-width: 580px;
+    max-height: calc(100vh - 40px);
+    max-height: calc(100dvh - 40px);
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius-lg);
     background: var(--surface);
-    border-radius: 16px;
-
-    padding: 28px;
-
-    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.18);
-
-    animation: modalFadeIn 0.2s ease;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+    animation: modal-in 0.2s ease-out;
 }
 
-@keyframes modalFadeIn {
+@keyframes modal-in {
     from {
         opacity: 0;
         transform: translateY(12px);
     }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
 }
-
-/* =================================
-   MODAL HEADER
-================================= */
 
 .modal-header {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-
-    margin-bottom: 25px;
+    gap: 16px;
+    padding: 24px 24px 0;
 }
 
 .modal-header h2 {
-    margin: 0 0 6px;
-
-    color: var(--text);
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .modal-header p {
-    margin: 0;
-
+    margin-top: 2px;
     color: var(--text-secondary);
-    font-size: 12px;
+    font-size: 13px;
 }
 
 .modal-close {
-    width: 32px;
-    height: 32px;
-
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     border: none;
-    border-radius: 8px;
-
+    border-radius: 10px;
     background: var(--background);
     color: var(--text-secondary);
-
-    font-size: 24px;
-    line-height: 1;
-
-    cursor: pointer;
-    transition: 0.2s;
+    transition: background 0.2s, color 0.2s;
 }
 
 .modal-close:hover {
@@ -696,360 +783,225 @@ body.sidebar-open {
     color: var(--brand-dark);
 }
 
-/* =================================
-   FORM FIELDS
-================================= */
-
-#transactionForm {
+/* The form fills the modal: fields scroll, buttons stay at the bottom */
+.transaction-form {
+    min-height: 0;
     display: flex;
     flex-direction: column;
-    gap: 17px;
 }
 
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.form-body {
+    overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    padding: 20px 24px;
 }
-
-.form-group label {
-    color: var(--text);
-    font-size: 12px;
-    font-weight: 700;
-}
-
-.form-group input,
-.form-group textarea {
-    width: 100%;
-    box-sizing: border-box;
-
-    padding: 12px 13px;
-
-    border: 1px solid var(--border);
-    border-radius: 8px;
-
-    background: #fff;
-    color: var(--text);
-
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-
-    outline: none;
-    transition: border 0.2s, box-shadow 0.2s;
-}
-
-.form-group input:focus,
-.form-group textarea:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(71, 118, 83, 0.10);
-}
-
-.form-group input::placeholder,
-.form-group textarea::placeholder {
-    color: #a5b0a7;
-}
-
-.form-group textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-/* =================================
-   DATE TOGGLE
-================================= */
-
-.date-label-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.date-hint {
-    margin: -3px 0 2px;
-
-    color: var(--text-secondary);
-    font-size: 11px;
-}
-
-.toggle-switch {
-    position: relative;
-    display: inline-block;
-
-    width: 38px;
-    height: 21px;
-}
-
-.toggle-switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.toggle-slider {
-    position: absolute;
-    inset: 0;
-
-    background: #cbd5cc;
-    border-radius: 20px;
-
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.toggle-slider::before {
-    content: "";
-
-    position: absolute;
-    width: 15px;
-    height: 15px;
-
-    left: 3px;
-    top: 3px;
-
-    background: white;
-    border-radius: 50%;
-
-    transition: 0.2s;
-}
-
-.toggle-switch input:checked + .toggle-slider {
-    background: var(--primary);
-}
-
-.toggle-switch input:checked + .toggle-slider::before {
-    transform: translateX(17px);
-}
-
-/* =================================
-   AMOUNT FIELD
-================================= */
-
-.amount-input-wrapper {
-    position: relative;
-}
-
-.amount-input-wrapper > span {
-    position: absolute;
-    left: 13px;
-    top: 50%;
-
-    transform: translateY(-50%);
-
-    color: var(--text-secondary);
-    font-size: 13px;
-    font-weight: 600;
-}
-
-.amount-input-wrapper input {
-    padding-left: 32px;
-}
-
-
-/* =================================
-   TRANSACTION TYPE DROPDOWN
-================================= */
-
-.form-group select {
-    width: 100%;
-    box-sizing: border-box;
-
-    padding: 12px 13px;
-
-    border: 1px solid var(--border);
-    border-radius: 8px;
-
-    background: #fff;
-    color: var(--text);
-
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-
-    outline: none;
-    cursor: pointer;
-
-    transition: border 0.2s, box-shadow 0.2s;
-}
-
-.form-group select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(71, 118, 83, 0.10);
-}
-
-
-/* =================================
-   MODAL ACTIONS
-================================= */
 
 .modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 10px;
-
-    margin-top: 8px;
+    padding: 16px 24px 22px;
+    border-top: 1px solid var(--border);
 }
 
-.cancel-btn,
-.save-transaction-btn {
-    padding: 11px 18px;
 
-    border: none;
-    border-radius: 8px;
+/* =====================================================
+   13. FORM FIELDS
+   ===================================================== */
 
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
+.form-group {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group > label,
+.date-label-row > label:first-child {
+    font-size: 13px;
     font-weight: 700;
-
-    cursor: pointer;
-    transition: 0.2s;
 }
 
-.cancel-btn {
+.input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: #ffffff;
+    color: var(--text);
+    font-size: 14px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input::placeholder {
+    color: #a5b0a7;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(71, 118, 83, 0.15);
+}
+
+.input:disabled {
     background: var(--background);
     color: var(--text-secondary);
+    cursor: not-allowed;
 }
 
-.cancel-btn:hover {
-    background: var(--border);
+textarea.input {
+    min-height: 90px;
+    resize: vertical;
 }
 
-.save-transaction-btn {
+/* Custom dropdown arrow */
+select.input {
+    appearance: none;
+    padding-right: 36px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%237b8b7e' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 13px center;
+    cursor: pointer;
+}
+
+.field-hint {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+/* Date label + "Today" switch */
+.date-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.toggle {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.toggle input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+}
+
+.toggle-track {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    border-radius: 999px;
+    background: #cbd5cc;
+    transition: background 0.2s;
+}
+
+.toggle-track::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #ffffff;
+    transition: transform 0.2s;
+}
+
+.toggle input:checked + .toggle-track {
     background: var(--primary);
-    color: white;
 }
 
-.save-transaction-btn:hover {
-    background: var(--primary-dark);
+.toggle input:checked + .toggle-track::before {
+    transform: translateX(16px);
 }
 
-/* =================================
-   RESPONSIVE MODAL
-================================= */
+.toggle input:focus-visible + .toggle-track {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
 
-@media screen and (max-width: 480px) {
+/* Peso sign inside the amount field */
+.amount-field {
+    position: relative;
+}
 
-    .modal-overlay {
-        padding: 12px;
-    }
+.amount-field span {
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translateY(-50%);
+    color: var(--text-secondary);
+    font-weight: 600;
+    pointer-events: none;
+}
 
-    .transaction-modal {
-        padding: 22px 18px;
-        max-height: 92vh;
-    }
-
-    .modal-header h2 {
-        font-size: 18px;
-    }
-
-    .modal-actions {
-        flex-direction: column-reverse;
-    }
-
-    .cancel-btn,
-    .save-transaction-btn {
-        width: 100%;
-        padding: 13px;
-    }
-
+.amount-field .input {
+    padding-left: 30px;
 }
 
 
-/* =================================
-   TABLETS AND SMALL LAPTOPS
-================================= */
+/* =====================================================
+   14. RESPONSIVE: LAPTOPS (1100px and below)
+   ===================================================== */
 
-@media screen and (max-width: 1100px) {
+@media (max-width: 1100px) {
 
-    .sidebar {
-        width: 210px;
-        min-width: 210px;
+    .topbar,
+    .footer {
+        padding-left: 24px;
+        padding-right: 24px;
     }
 
     .main-content {
         padding: 24px;
     }
 
-    .summary-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+    .data-table th,
+    .data-table td {
+        padding-left: 16px;
+        padding-right: 16px;
     }
 
-    .summary-card {
-        padding: 20px 15px;
-    }
-
-    .data-grid th,
-    .data-grid td {
-        padding: 14px 15px;
-    }
 }
 
-/* =================================
-   MOBILE AND TABLET SIDEBAR
-   649px AND BELOW
-================================= */
 
-@media screen and (max-width: 649px) {
+/* =====================================================
+   15. RESPONSIVE: TABLETS (960px and below)
+   The sidebar becomes a slide-in menu.
+   ===================================================== */
 
-    .app-container {
-        display: block;
+@media (max-width: 960px) {
+
+    .hamburger,
+    .close-sidebar {
+        display: inline-flex;
     }
-
-    /* HAMBURGER */
-
-    .hamburger-menu {
-        display: flex;
-    }
-
-    .navbar {
-        min-height: 70px;
-        padding: 12px 18px;
-        justify-content: flex-start;
-        gap: 14px;
-    }
-
-    .header-title {
-        flex: 1;
-        min-width: 0;
-    }
-
-    .header-title h2 {
-        font-size: 16px;
-    }
-
-    .header-label {
-        font-size: 8px;
-    }
-
-    .nav-right {
-        gap: 10px;
-    }
-
-    .user-avatar {
-        width: 35px;
-        height: 35px;
-    }
-
-    /* FULL SCREEN SIDEBAR */
 
     .sidebar {
         position: fixed;
-        inset: 0;
-        width: 100%;
-        min-width: 0;
-        height: 100vh;
-        height: 100dvh;
-        padding: 25px 22px;
-        overflow-y: auto;
-
-        display: flex;
-        flex-direction: column;
-
+        top: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 900;
+        width: min(300px, 85vw);
         transform: translateX(-100%);
         visibility: hidden;
-        transition:
-            transform .4s cubic-bezier(.77, 0, .175, 1),
-            visibility .4s;
-
-        box-shadow: none;
+        transition: transform 0.3s ease, visibility 0.3s;
     }
 
     .sidebar.open {
@@ -1057,148 +1009,35 @@ body.sidebar-open {
         visibility: visible;
     }
 
-    /* SIDEBAR HEADER */
-
-    .mobile-menu-header {
-        padding-bottom: 25px;
-    }
-
-    .sidebar-brand {
-        padding: 0;
-    }
-
-    .brand-logo {
-        width: 44px;
-        height: 44px;
-        font-size: 27px;
-    }
-
-    .brand-name h1 {
-        font-size: 22px;
-    }
-
-    .close-sidebar {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* SIDEBAR NAVIGATION */
-
-    .sidebar-divider {
+    .sidebar-backdrop {
         display: block;
-        margin-bottom: 25px;
+        position: fixed;
+        inset: 0;
+        z-index: 899;
+        background: rgba(20, 35, 25, 0.5);
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
     }
 
-    .sidebar-nav {
-        flex-direction: column;
-        overflow: visible;
-        gap: 10px;
+    .sidebar-backdrop.visible {
+        opacity: 1;
+        visibility: visible;
     }
 
-    .nav-link {
-        flex: initial;
-        width: 100%;
-        padding: 16px;
-        font-size: 14px;
-    }
-
-    .nav-link span {
-        font-size: 21px;
-    }
-
-    .sidebar-quote {
-        display: block;
-        margin-top: auto;
-    }
-
-    /* CONTENT */
-
-    .main-content {
-        padding: 20px;
-    }
-
-    .welcome-banner {
-        min-height: 130px;
-        padding: 25px;
-    }
-
-    .welcome-banner h2 {
-        font-size: 28px;
-    }
-
-    .welcome-banner p {
-        font-size: 13px;
-    }
-
-    .welcome-decoration {
-        font-size: 60px;
-    }
-
-    /* CONNECTION */
-
-    .connection-panel {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 14px;
-    }
-
-    .connect-button {
-        width: 100%;
-    }
-
-    /* SUMMARY */
-
-    .summary-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-    }
-
-    .summary-card {
-        padding: 16px;
-        gap: 12px;
-    }
-
-    .summary-card h3 {
-        font-size: 16px;
-    }
-
-    /* DATABASE */
-
-    .database-header {
-        padding: 20px;
-    }
-
-    .data-grid {
-        min-width: 700px;
-    }
-
-    .table-wrapper {
-        overflow-x: auto;
-    }
-
-    /* SAVINGS */
-
-    .savings-banner {
-        padding: 18px;
-        flex-wrap: wrap;
-    }
-
-    .savings-text {
-        min-width: 180px;
-    }
 }
 
-/* =================================
-   MOBILE PHONES
-   480px AND BELOW
-================================= */
 
-@media screen and (max-width: 480px) {
+/* =====================================================
+   16. RESPONSIVE: PHONES (720px and below)
+   ===================================================== */
 
-    .navbar {
-        min-height: 65px;
-        padding: 10px 14px;
+@media (max-width: 720px) {
+
+    /* Layout */
+    .topbar {
+        min-height: 64px;
+        padding: 10px 16px;
     }
 
     .system-label {
@@ -1206,196 +1045,198 @@ body.sidebar-open {
     }
 
     .main-content {
-        padding: 14px;
+        padding: 18px 16px 28px;
+        gap: 16px;
     }
 
-    .welcome-banner {
-        min-height: 115px;
-        padding: 20px;
-        border-radius: 13px;
+    .footer {
+        justify-content: center;
+        padding: 16px;
+        text-align: center;
     }
 
-    .welcome-banner h2 {
-        font-size: 24px;
-        margin: 9px 0 6px;
+    /* Overview */
+    .overview {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+        padding: 24px 22px;
     }
 
-    .welcome-banner p {
-        font-size: 11px;
+    .overview-balance {
+        text-align: left;
     }
 
-    .welcome-decoration {
-        display: none;
-    }
-
-    .connection-panel {
-        padding: 15px;
-    }
-
-    .connection-info p {
-        font-size: 10px;
-        line-height: 1.5;
-    }
-
-    .connect-button {
-        padding: 12px;
-        font-size: 11px;
-    }
-
+    /* Summary cards stack */
     .summary-grid {
         grid-template-columns: 1fr;
         gap: 10px;
     }
 
     .summary-card {
-        padding: 15px;
+        padding: 14px 16px;
     }
 
-    .summary-icon {
-        width: 40px;
-        height: 40px;
+    .summary-value {
         font-size: 18px;
     }
 
-    .summary-card h3 {
-        font-size: 17px;
+    /* Transactions header */
+    .transactions-header {
+        padding: 18px 16px;
     }
 
-    .database-section {
-        border-radius: 12px;
+    .transactions-header .button {
+        width: 100%;
     }
 
-    .database-header {
-        padding: 17px 15px;
-        align-items: flex-start;
+    /* Table rows turn into cards */
+    .data-table thead {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0 0 0 0);
+    }
+
+    .data-table,
+    .data-table tbody,
+    .data-table tr,
+    .data-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .data-table tr {
+        padding: 12px 16px;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .data-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .data-table tbody tr:hover {
+        background: transparent;
+    }
+
+    .data-table td,
+    .data-table .cell-amount {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 5px 0;
+        border-bottom: none;
+        text-align: right;
+        white-space: normal;
+    }
+
+    /* Show the column name on the left (from data-label) */
+    .data-table td::before {
+        content: attr(data-label);
+        flex-shrink: 0;
+        color: var(--text-secondary);
+        font-weight: 600;
+        text-align: left;
+    }
+
+    .data-table td.cell-purpose {
+        min-width: 0;
         flex-direction: column;
+        gap: 2px;
+        text-align: left;
     }
 
-    .database-header h3 {
+    .data-table td.empty-state {
+        display: block;
+        padding: 32px 0;
+        text-align: center;
+    }
+
+    .data-table td.empty-state::before {
+        content: none;
+    }
+
+    /* Savings note */
+    .savings-note {
+        padding: 16px;
+    }
+
+    /* Modal becomes a bottom sheet */
+    .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+    }
+
+    .transaction-modal {
+        max-width: none;
+        max-height: 92vh;
+        max-height: 92dvh;
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    .modal-header {
+        padding: 20px 16px 0;
+    }
+
+    .form-body {
+        grid-template-columns: 1fr;
+        padding: 18px 16px;
+    }
+
+    .modal-actions {
+        padding: 14px 16px calc(16px + env(safe-area-inset-bottom));
+    }
+
+    .modal-actions .button {
+        flex: 1;
+    }
+
+    /* 16px stops iPhones from zooming in when typing */
+    .input {
         font-size: 16px;
     }
 
-    .database-header p {
-        font-size: 10px;
-    }
-
-    .table-actions {
-        width: 100%;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-
-    .add-transaction-btn {
-        padding: 10px 14px;
-        font-size: 11px;
-
-    .record-count {
-        font-size: 10px;
-        padding: 8px 11px;
-    }
-
-    .data-grid {
-        min-width: 700px;
-    }
-
-    .table-footer {
-        padding: 13px;
-        font-size: 10px;
-    }
-
-    .savings-banner {
-        padding: 16px;
-        gap: 12px;
-    }
-
-    .savings-icon {
-        width: 40px;
-        height: 40px;
-        font-size: 23px;
-    }
-
-    .savings-text h3 {
-        font-size: 12px;
-    }
-
-    .savings-text p {
-        font-size: 10px;
-        line-height: 1.5;
-    }
-
-    .savings-tag {
-        display: none;
-    }
-
-    .footer {
-        padding: 16px;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        gap: 7px;
-        font-size: 9px;
-    }
 }
 
-/* =================================
-   EXTRA SMALL DEVICES
-================================= */
 
-@media screen and (max-width: 360px) {
+/* =====================================================
+   17. RESPONSIVE: SMALL PHONES (400px and below)
+   ===================================================== */
 
-    .brand-name h1 {
-        font-size: 18px;
-    }
+@media (max-width: 400px) {
 
-    .brand-name span {
-        font-size: 8px;
-    }
-
-    .nav-link {
-        padding: 14px 12px;
-        font-size: 12px;
-    }
-
-    .welcome-banner h2 {
-        font-size: 21px;
+    .page-title p {
+        display: none;
     }
 
     .main-content {
-        padding: 11px;
+        padding: 14px 12px 24px;
     }
 
-    .summary-card h3 {
-        font-size: 15px;
+    .overview {
+        padding: 22px 18px;
     }
+
+    .savings-note {
+        align-items: flex-start;
+    }
+
 }
 
-/* =================================
-   DESKTOP SIDEBAR
-   650px AND ABOVE
-================================= */
 
-@media screen and (min-width: 650px) {
+/* =====================================================
+   18. REDUCED MOTION
+   Turns off animations for people who prefer less motion.
+   ===================================================== */
 
-    .sidebar {
-        position: relative;
-        inset: auto;
-        transform: none;
-        visibility: visible;
-        height: auto;
-        min-height: 100vh;
-        transition: none;
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
     }
 
-    .hamburger-menu,
-    .close-sidebar {
-        display: none;
-    }
-
-    .mobile-menu-header {
-        display: flex;
-    }
-
-    body.sidebar-open {
-        overflow: auto;
-    }
 }

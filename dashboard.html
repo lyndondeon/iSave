@@ -1,389 +1,381 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iSave | Dashboard</title>
+    <title>Dashboard | iSave</title>
     <link rel="stylesheet" href="Style.css">
 </head>
+
 <body>
 
-<div class="app-container">
+<div class="app">
 
+    <!-- =====================================================
+         SIDEBAR
+         Always visible on desktop.
+         On tablets and phones it slides in from the left.
+    ====================================================== -->
+    <aside class="sidebar" id="sidebar" aria-label="Main menu">
 
-
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-
-        <div class="mobile-menu-header">
-            <div class="sidebar-brand">
-                <div class="brand-logo">i</div>
-                <div class="brand-name">
-                    <h1>iSave</h1>
-                </div>
+        <!-- Brand + close button (close button shows on small screens only) -->
+        <div class="sidebar-header">
+            <div class="brand">
+                <div class="brand-logo" aria-hidden="true">i</div>
+                <span class="brand-name">iSave</span>
             </div>
 
-            <button type="button" id="closeSidebar" class="close-sidebar">
-                &times;
+            <button type="button" id="closeSidebar" class="close-sidebar" aria-label="Close menu">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
             </button>
         </div>
 
-        <div class="sidebar-divider"></div>
-
+        <!-- Navigation links -->
         <nav class="sidebar-nav">
-            <a href="#" class="nav-link active">
-                <span>⌂</span> Dashboard
+            <a href="dashboard.html" class="nav-link active" aria-current="page">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>
+                </svg>
+                Dashboard
             </a>
 
             <a href="#" class="nav-link">
-                <span>▦</span> Transactions
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+                </svg>
+                Transactions
             </a>
 
             <a href="#" class="nav-link">
-                <span>▥</span> Reports
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M3 3v18h18"/><path d="M7 15v2M12 10v7M17 6v11"/>
+                </svg>
+                Reports
             </a>
 
             <a href="#" class="nav-link">
-                <span>⚙</span> Settings
-            </a>
-
-            <a href="#" class="nav-link">
-                <span>⇥</span> Logout
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>
+                </svg>
+                Settings
             </a>
         </nav>
 
-        <div class="sidebar-quote">
-            <p>"Small steps today, big savings tomorrow."</p>
+        <!-- Bottom of sidebar: log out + quote -->
+        <div class="sidebar-footer">
+            <button type="button" id="logoutButton" class="nav-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/>
+                </svg>
+                Log out
+            </button>
+
+            <p class="sidebar-quote">"Small steps today, big savings tomorrow."</p>
         </div>
 
     </aside>
 
-    <!-- MAIN CONTENT -->
+    <!-- Dark background behind the sidebar on small screens -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+
+    <!-- =====================================================
+         MAIN AREA
+    ====================================================== -->
     <div class="main-area">
 
-        <header class="navbar">
+        <!-- TOP BAR -->
+        <header class="topbar">
 
-            <!-- MOBILE MENU BUTTON -->
-            <button type="button" id="hamburgerBtn" class="hamburger-menu">
-                <span></span>
-                <span></span>
-                <span></span>
+            <!-- Menu button (shows on small screens only) -->
+            <button
+                type="button"
+                id="openSidebar"
+                class="hamburger"
+                aria-label="Open menu"
+                aria-controls="sidebar"
+                aria-expanded="false">
+
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <path d="M3 6h18M3 12h18M3 18h18"/>
+                </svg>
             </button>
 
-            <div class="header-title">
-                <span class="header-label">PERSONAL FINANCE MANAGER</span>
-                <h2>Dashboard</h2>
+            <div class="page-title">
+                <h1>Dashboard</h1>
+                <p>Personal finance manager</p>
             </div>
 
-            <div class="nav-right">
-                <span class="system-label">Personal Database</span>
-                <div class="user-avatar">U</div>
+            <div class="topbar-right">
+                <span class="system-label">Personal database</span>
+                <div class="user-avatar" id="userAvatar" aria-hidden="true">U</div>
             </div>
 
         </header>
 
+
         <main class="main-content">
 
-            <!-- WELCOME -->
-            <section class="welcome-banner">
-                <div>
-                    <span class="eyebrow">OVERVIEW</span>
-                    <h2>Welcome back!</h2>
-                    <p>Track. Save. Achieve your goals.</p>
+            <!-- OVERVIEW: welcome message + total balance -->
+            <section class="overview" aria-labelledby="welcomeTitle">
+
+                <div class="overview-text">
+                    <p class="overview-date" id="todayLabel"></p>
+                    <h2 id="welcomeTitle">Welcome back!</h2>
+                    <p class="overview-tagline">Track. Save. Achieve your goals.</p>
                 </div>
-                <div class="welcome-decoration">✦</div>
+
+                <div class="overview-balance">
+                    <span>Total balance</span>
+                    <strong id="totalBalance">₱0.00</strong>
+                    <small>Available balance</small>
+                </div>
+
             </section>
 
-            
 
             <!-- SUMMARY CARDS -->
-            <section class="summary-grid">
+            <section class="summary-grid" aria-label="Summary">
 
-                <div class="summary-card">
-                    <div class="summary-icon">₱</div>
-                    <div>
-                        <span>Total Balance</span>
-                        <h3>₱0.00</h3>
-                        <small>Available balance</small>
+                <article class="summary-card">
+                    <div class="summary-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 5v14M19 12l-7 7-7-7"/>
+                        </svg>
                     </div>
-                </div>
+                    <div>
+                        <p class="summary-label">Total income</p>
+                        <p class="summary-value" id="totalIncome">₱0.00</p>
+                        <p class="summary-hint">Money received</p>
+                    </div>
+                </article>
 
-                <div class="summary-card">
-                    <div class="summary-icon">↓</div>
-                    <div>
-                        <span>Total Income</span>
-                        <h3>₱0.00</h3>
-                        <small>Money received</small>
+                <article class="summary-card">
+                    <div class="summary-icon is-expense" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 19V5M5 12l7-7 7 7"/>
+                        </svg>
                     </div>
-                </div>
+                    <div>
+                        <p class="summary-label">Total expenses</p>
+                        <p class="summary-value" id="totalExpenses">₱0.00</p>
+                        <p class="summary-hint">Money spent</p>
+                    </div>
+                </article>
 
-                <div class="summary-card">
-                    <div class="summary-icon">↑</div>
-                    <div>
-                        <span>Total Expenses</span>
-                        <h3>₱0.00</h3>
-                        <small>Money spent</small>
+                <article class="summary-card">
+                    <div class="summary-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <ellipse cx="12" cy="5" rx="9" ry="3"/>
+                            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
+                            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
+                        </svg>
                     </div>
-                </div>
-
-                <div class="summary-card">
-                    <div class="summary-icon">▦</div>
                     <div>
-                        <span>Total Records</span>
-                        <h3 id="totalRecords">00</h3>
-                        <small>Database transactions</small>
+                        <p class="summary-label">Total records</p>
+                        <p class="summary-value" id="totalRecords">0</p>
+                        <p class="summary-hint">Saved transactions</p>
                     </div>
-                </div>
+                </article>
 
             </section>
 
-            <!-- DATABASE TABLE -->
-            <section class="database-section">
 
-                <div class="database-header">
+            <!-- TRANSACTIONS TABLE -->
+            <section class="transactions" aria-labelledby="transactionsTitle">
+
+                <div class="transactions-header">
                     <div>
-                        <span class="eyebrow">DATABASE MANAGEMENT</span>
-                        <h3>Recent Transactions</h3>
-                        <p>Your personal financial records</p>
+                        <h3 id="transactionsTitle">Recent transactions</h3>
+                        <p id="recordSummary">Your personal financial records</p>
                     </div>
 
-                    <!-- ADD TRANSACTION BUTTON -->
-                    <button
-                        type="button"
-                        id="addTransactionBtn"
-                        class="add-transaction-btn">
-
-                        <span class="add-icon">+</span>
-                        Add Transaction
+                    <button type="button" id="addTransactionBtn" class="button button-primary">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+                            <path d="M12 5v14M5 12h14"/>
+                        </svg>
+                        Add transaction
                     </button>
-
-                    <!-- RECORD COUNT -->
-                    <span class="record-count">
-                        <span class="record-icon">▤</span>
-                        All Records
-                    </span>
                 </div>
 
                 <div class="table-wrapper">
-                    <table class="data-grid">
+                    <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Date</th>
-                                <th>Payroll</th>
-                                <th>Sender</th>
-                                <th>Amount</th>
-                                <th>Receiver</th>
-                                <th>Purpose/Definition</th>
+                                <th scope="col" class="cell-date">Date</th>
+                                <th scope="col" class="cell-payroll">Payroll</th>
+                                <th scope="col" class="cell-sender">Sender</th>
+                                <th scope="col" class="cell-amount">Amount</th>
+                                <th scope="col" class="cell-receiver">Receiver</th>
+                                <th scope="col" class="cell-purpose">Purpose/Definition</th>
                             </tr>
                         </thead>
 
+                        <!-- Rows are added by script.js -->
                         <tbody id="transactionTableBody">
                             <tr>
-                                <td colspan="7" class="empty-state">
-                                    Click Connect Database to load transactions.
-                                </td>
+                                <td colspan="6" class="empty-state">Loading transactions...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div class="table-footer">
-                    <span>Personal transaction records</span>
-                    <div class="pagination">
-                        <button disabled>‹</button>
-                        <button class="page-active">1</button>
-                        <button disabled>›</button>
-                    </div>
-                </div>
-
             </section>
 
-            <!-- SAVINGS GOAL -->
-            <section class="savings-banner">
-                <div class="savings-icon">◎</div>
-                <div class="savings-text">
+
+            <!-- SAVINGS NOTE -->
+            <section class="savings-note">
+                <div class="savings-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/>
+                    </svg>
+                </div>
+                <div>
                     <h3>Keep building your future.</h3>
                     <p>Every peso saved brings you closer to your goals.</p>
                 </div>
-                <div class="savings-tag">SAVE SMARTER</div>
             </section>
 
         </main>
 
+
+        <!-- FOOTER -->
         <footer class="footer">
             <span>iSave Database Management System</span>
             <span>Simple. Organized. Secure.</span>
         </footer>
 
     </div>
+
 </div>
 
 
-<!-- =================================
+<!-- =====================================================
      ADD TRANSACTION MODAL
-================================= -->
+     Hidden until "Add transaction" is clicked.
+====================================================== -->
+<div class="modal-overlay" id="transactionModal" hidden>
 
-<div class="modal-overlay" id="transactionModal">
+    <div
+        class="transaction-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="transactionModalTitle">
 
-    <div class="transaction-modal">
-
+        <!-- Modal header -->
         <div class="modal-header">
             <div>
-                <h2>Add Transaction</h2>
+                <h2 id="transactionModalTitle">Add transaction</h2>
                 <p>Fill in the details of your transaction.</p>
             </div>
 
-            <button
-                type="button"
-                class="modal-close"
-                id="closeTransactionModal"
-                aria-label="Close"
-            >
-                &times;
+            <button type="button" class="modal-close" id="closeTransactionModal" aria-label="Close">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                    <path d="M18 6 6 18M6 6l12 12"/>
+                </svg>
             </button>
         </div>
 
-        <form id="transactionForm">
+        <form id="transactionForm" class="transaction-form" novalidate>
 
-            <!-- DATE -->
-            <div class="form-group">
+            <!-- Scrollable form fields -->
+            <div class="form-body">
 
-                <div class="date-label-row">
-                    <label for="transactionDate">Date</label>
+                <!-- DATE -->
+                <div class="form-group">
+                    <div class="date-label-row">
+                        <label for="transactionDate">Date</label>
 
-                    <label class="toggle-switch">
+                        <label class="toggle">
+                            <input type="checkbox" id="todayDateToggle" checked>
+                            <span class="toggle-track" aria-hidden="true"></span>
+                            Today
+                        </label>
+                    </div>
+
+                    <input type="date" id="transactionDate" class="input" disabled>
+
+                    <p class="field-hint" id="dateHint">Using today's date.</p>
+                </div>
+
+                <!-- PAYROLL -->
+                <div class="form-group">
+                    <label for="payroll">Payroll</label>
+
+                    <select id="payroll" class="input">
+                        <option value="" disabled selected>Select payroll</option>
+                        <option value="1">First cutoff</option>
+                        <option value="2">Second cutoff</option>
+                    </select>
+                </div>
+
+                <!-- SENDER -->
+                <div class="form-group">
+                    <label for="sender">Sender</label>
+                    <input type="text" id="sender" class="input" placeholder="Who sent the money?">
+                </div>
+
+                <!-- RECEIVER -->
+                <div class="form-group">
+                    <label for="receiver">Receiver</label>
+                    <input type="text" id="receiver" class="input" placeholder="Who received the money?">
+                </div>
+
+                <!-- AMOUNT -->
+                <div class="form-group">
+                    <label for="amount">Amount</label>
+
+                    <div class="amount-field">
+                        <span aria-hidden="true">₱</span>
                         <input
-                            type="checkbox"
-                            id="todayDateToggle"
-                            checked
-                        >
-                        <span class="toggle-slider"></span>
-                    </label>
+                            type="number"
+                            id="amount"
+                            class="input"
+                            placeholder="0.00"
+                            min="0.01"
+                            step="0.01"
+                            inputmode="decimal">
+                    </div>
                 </div>
 
-                <p class="date-hint" id="dateHint">
-                    Automatically using today's date.
-                </p>
+                <!-- TRANSACTION TYPE -->
+                <div class="form-group">
+                    <label for="transactionType">Transaction type</label>
 
-                <input
-                    type="date"
-                    id="transactionDate"
-                    name="date"
-                    required
-                    disabled
-                >
-
-            </div>
-
-            <div class="form-group">
-                <label for="payroll">Payroll</label>
-
-                <select
-                    id="payroll"
-                    name="payroll"
-                    required
-                >
-                    <option value="" disabled selected>Select payroll</option>
-                    <option value="1">First Cutoff</option>
-                    <option value="2">Second Cutoff</option>
-                </select>
-            </div>
-
-            <!-- SENDER -->
-            <div class="form-group">
-                <label for="sender">Sender</label>
-
-                <input
-                    type="text"
-                    id="sender"
-                    name="sender"
-                    placeholder="Enter sender"
-                    required
-                >
-            </div>
-
-            <!-- AMOUNT -->
-            <div class="form-group">
-                <label for="amount">Amount</label>
-
-                <div class="amount-input-wrapper">
-                    <span>₱</span>
-
-                    <input
-                        type="number"
-                        id="amount"
-                        name="amount"
-                        placeholder="0.00"
-                        min="0.01"
-                        step="0.01"
-                        required
-                    >
+                    <select id="transactionType" class="input">
+                        <option value="" disabled selected>Select type</option>
+                        <option value="Bank Transfer">Bank transfer</option>
+                        <option value="Daily Allowance">Daily allowance</option>
+                        <option value="Loan">Loan</option>
+                        <option value="Expenses">Expenses</option>
+                        <option value="Savings">Savings</option>
+                    </select>
                 </div>
+
+                <!-- PURPOSE / DEFINITION (full width) -->
+                <div class="form-group full-width">
+                    <label for="purpose">Purpose / definition</label>
+
+                    <textarea
+                        id="purpose"
+                        class="input"
+                        rows="3"
+                        placeholder="What was this transaction for?"></textarea>
+                </div>
+
             </div>
 
-            <!-- RECEIVER -->
-            <div class="form-group">
-                <label for="receiver">Receiver</label>
-
-                <input
-                    type="text"
-                    id="receiver"
-                    name="receiver"
-                    placeholder="Enter receiver"
-                    required
-                >
-            </div>
-
-            <!-- TRANSACTION -->
-            <div class="form-group">
-                <label for="transactionType">Transaction Type</label>
-
-                <select
-                    id="transactionType"
-                    name="transactionType"
-                    required
-                >
-                    <option value="" disabled selected>Select transaction type</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                    <option value="Daily Allowance">Daily Allowance</option>
-                    <option value="Loan">Loan</option>
-                    <option value="Expenses">Expenses</option>
-                    <option value="Savings">Savings</option>
-                </select>
-            </div>
-
-            <!-- PURPOSE / DEFINITION -->
-            <div class="form-group">
-                <label for="purpose">Purpose / Definition</label>
-
-                <textarea
-                    id="purpose"
-                    name="purpose"
-                    rows="4"
-                    placeholder="Write the purpose or description of this transaction..."
-                    required
-                ></textarea>
-            </div>
-
-            <!-- BUTTONS -->
+            <!-- Modal buttons -->
             <div class="modal-actions">
-
-                <button
-                    type="button"
-                    class="cancel-btn"
-                    id="cancelTransaction"
-                >
+                <button type="button" class="button button-secondary" id="cancelTransaction">
                     Cancel
                 </button>
 
-                <button
-                    type="submit"
-                    class="save-transaction-btn"
-                >
-                    Save Transaction
+                <button type="submit" class="button button-primary" id="saveTransactionBtn">
+                    Save transaction
                 </button>
-
             </div>
 
         </form>
@@ -393,50 +385,12 @@
 </div>
 
 
-
-<!-- EXISTING LIBRARIES AND SCRIPT -->
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<!-- =====================================================
+     SCRIPTS
+     Keep "script.js" in lowercase so it works on Vercel.
+====================================================== -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="Script.js"></script>
+<script src="script.js"></script>
 
 </body>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-
-    const hamburgerBtn = document.getElementById("hamburgerBtn");
-    const closeSidebarBtn = document.getElementById("closeSidebar");
-    const sidebar = document.getElementById("sidebar");
-
-    if (!hamburgerBtn || !closeSidebarBtn || !sidebar) {
-        console.error("Sidebar elements not found.");
-        return;
-    }
-
-    function openSidebar() {
-        sidebar.classList.add("open");
-        document.body.classList.add("sidebar-open");
-    }
-
-    function closeSidebar() {
-        sidebar.classList.remove("open");
-        document.body.classList.remove("sidebar-open");
-    }
-
-    hamburgerBtn.addEventListener("click", openSidebar);
-    closeSidebarBtn.addEventListener("click", closeSidebar);
-
-    sidebar.querySelectorAll(".nav-link").forEach(function (link) {
-        link.addEventListener("click", closeSidebar);
-    });
-
-    window.addEventListener("resize", function () {
-        if (window.innerWidth >= 650) {
-            closeSidebar();
-        }
-    });
-
-});
-</script>
-
 </html>

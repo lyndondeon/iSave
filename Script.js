@@ -1,23 +1,28 @@
 // =====================================================
 // iSave - MAIN SCRIPT
 // =====================================================
-// Laman ng file na ito (sunod-sunod):
-//   1. Supabase Setup
-//   2. Message Box (kapalit ng alert)
-//   3. Helper Functions
-//   4. Create Account Page
-//   5. Login Page
-//   6. Dashboard Page
-//   7. Pagsisimula ng App
+// This one file is used by every page:
+// index.html (login), createaccount.html, and dashboard.html.
+// Each "setup" function checks if its page is open,
+// and quietly does nothing on the other pages.
+//
+// Contents:
+//   1. Supabase setup
+//   2. Message box (replaces alert)
+//   3. Helper functions
+//   4. Create account page
+//   5. Login page
+//   6. Dashboard page
+//   7. Start the app
 // =====================================================
 
 
 // =====================================================
 // 1. SUPABASE SETUP
 // =====================================================
-// Okay lang na makita ang "publishable" key sa browser.
-// Ang totoong proteksyon ng data mo ay ang RLS
-// (Row Level Security) sa Supabase dashboard.
+// The "publishable" key is safe to show in the browser.
+// Your data is protected by RLS (Row Level Security)
+// in the Supabase dashboard.
 
 const SUPABASE_URL = "https://yvmaiuaitwyhkhsxvari.supabase.co";
 const SUPABASE_KEY = "sb_publishable_O1BFpAxcpbB_Clh3ragvKQ_Az6Jvviy";
@@ -26,18 +31,18 @@ const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 
 // =====================================================
-// 2. MESSAGE BOX (kapalit ng alert)
+// 2. MESSAGE BOX (replaces alert)
 // =====================================================
-// Paano gamitin:
+// How to use:
 //
-//   await showMessage("error", "Title dito", "Message dito");
+//   await showMessage("error", "Title here", "Message here");
 //
-// Mga pwedeng type: "success", "error", "warning", "info"
+// Types: "success", "error", "warning", "info"
 //
-// Dahil may "await", maghihintay muna ang code
-// hanggang pindutin ng user ang OK bago tumuloy.
-// Hindi mo na kailangang galawin ang HTML mo.
-// Kusang idadagdag ng JS ang design ng message box.
+// Because of "await", the code waits until the user
+// clicks OK before it continues.
+// The message box styles are added by this script,
+// so you don't need to change your HTML or CSS.
 
 const MESSAGE_ICONS = {
     success: "✓",
@@ -46,7 +51,7 @@ const MESSAGE_ICONS = {
     info: "i"
 };
 
-// Idinadagdag ang CSS ng message box sa page (isang beses lang)
+// Adds the message box CSS to the page (only once)
 function addMessageBoxStyles() {
 
     if (document.getElementById("messageBoxStyles")) return;
@@ -179,14 +184,14 @@ function addMessageBoxStyles() {
 
 }
 
-// Ipinapakita ang message box
+// Shows the message box
 function showMessage(type, title, message) {
 
     addMessageBoxStyles();
 
     return new Promise(function (resolve) {
 
-        // Gumawa ng background (overlay) at ng box
+        // Build the dark background (overlay) and the box
         const overlay = document.createElement("div");
         overlay.className = "message-overlay";
 
@@ -203,20 +208,18 @@ function showMessage(type, title, message) {
             </div>
         `;
 
-        // textContent ang gamit para ligtas (hindi mababasa bilang HTML)
+        // textContent is safe: the text is never read as HTML
         overlay.querySelector(".message-title").textContent = title;
         overlay.querySelector(".message-text").textContent = message;
 
         const okButton = overlay.querySelector(".message-ok");
 
-        // Isasara ang message box
         function closeMessage() {
             document.removeEventListener("keydown", closeOnEscape);
             overlay.remove();
             resolve();
         }
 
-        // Pwede ring isara gamit ang Escape key
         function closeOnEscape(event) {
             if (event.key === "Escape") closeMessage();
         }
@@ -224,7 +227,7 @@ function showMessage(type, title, message) {
         okButton.addEventListener("click", closeMessage);
         document.addEventListener("keydown", closeOnEscape);
 
-        // Pwede ring isara kapag pinindot ang madilim na background
+        // Clicking the dark background also closes it
         overlay.addEventListener("click", function (event) {
             if (event.target === overlay) closeMessage();
         });
@@ -236,29 +239,34 @@ function showMessage(type, title, message) {
 
 }
 
+// True while a message box is on screen
+function isMessageOpen() {
+    return document.querySelector(".message-overlay") !== null;
+}
+
 
 // =====================================================
 // 3. HELPER FUNCTIONS
 // =====================================================
 
-// Ipinapakita ang buong detalye ng error sa Console (F12)
+// Prints full error details in the Console (F12)
 function logError(context, error) {
 
     console.group(`ERROR: ${context}`);
     console.error("Message:", error?.message);
     console.error("Code:", error?.code);
     console.error("Status:", error?.status);
-    console.error("Full Error:", error);
+    console.error("Full error:", error);
     console.groupEnd();
 
 }
 
-// Kinukuha ang value ng input at tinatanggal ang extra spaces
+// Gets an input's value without extra spaces
 function getValue(inputId) {
     return document.getElementById(inputId).value.trim();
 }
 
-// Ilalagay ang cursor sa input na may problema
+// Puts the cursor in an input
 function focusField(inputId) {
 
     const input = document.getElementById(inputId);
@@ -267,7 +275,8 @@ function focusField(inputId) {
 
 }
 
-// Ipinapakita ang error, tapos ilalagay ang cursor sa tamang input
+// Shows a problem, then puts the cursor in the field that caused it
+// problem = { fieldId, title, message }
 async function showFormProblem(problem, type = "error") {
 
     await showMessage(type, problem.title, problem.message);
@@ -276,9 +285,9 @@ async function showFormProblem(problem, type = "error") {
 
 }
 
-// Nilo-loading / binabalik sa dati ang button
-// (sine-save nito ang dating laman ng button para hindi na
-//  kailangang ulitin ang HTML ng button sa code)
+// Turns a button's loading state on or off
+// (it remembers the button's original content, so the HTML
+//  of the button never has to be repeated in this file)
 function setButtonLoading(button, isLoading, loadingText) {
 
     if (isLoading) {
@@ -296,7 +305,7 @@ function setButtonLoading(button, isLoading, loadingText) {
 
 }
 
-// SHOW / HIDE ng password
+// Show / hide password button
 function setupPasswordToggle(inputId, buttonId) {
 
     const input = document.getElementById(inputId);
@@ -304,7 +313,7 @@ function setupPasswordToggle(inputId, buttonId) {
 
     if (!input || !button) return;
 
-    // Sinusundan ang itsura ng text sa HTML ("Show" o "SHOW")
+    // Keep the same letter case as the HTML ("Show" or "SHOW")
     const originalText = button.textContent.trim();
     const isUpperCase = originalText === originalText.toUpperCase();
 
@@ -321,6 +330,37 @@ function setupPasswordToggle(inputId, buttonId) {
 
 }
 
+// Friendly message for "no internet" and "too many attempts" errors.
+// Returns null if the error is something else.
+function getCommonProblem(error) {
+
+    const code = error?.code ?? "";
+    const message = (error?.message ?? "").toLowerCase();
+
+    if (error?.status === 429 || code.includes("rate_limit")) {
+
+        return {
+            fieldId: null,
+            title: "Too many attempts",
+            message: "Wait a few minutes, then try again."
+        };
+
+    }
+
+    if (message.includes("failed to fetch")) {
+
+        return {
+            fieldId: null,
+            title: "No connection",
+            message: "Check your internet connection, then try again."
+        };
+
+    }
+
+    return null;
+
+}
+
 
 // =====================================================
 // 4. CREATE ACCOUNT PAGE
@@ -329,14 +369,14 @@ function setupPasswordToggle(inputId, buttonId) {
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // -----------------------------------------------------
-// 4A. I-check ang laman ng form bago i-send
+// 4A. Check the form before sending it
 // -----------------------------------------------------
-// Kapag may mali: magbabalik ng { fieldId, title, message }
-// Kapag walang mali: magbabalik ng null
+// Returns { fieldId, title, message } if something is wrong,
+// or null if everything is fine.
 
 function validateAccount(account) {
 
-    // Hanapin ang unang input na walang laman
+    // Find the first empty field
     for (const fieldId in account) {
 
         if (account[fieldId] === "") {
@@ -408,7 +448,7 @@ function validateAccount(account) {
 }
 
 // -----------------------------------------------------
-// 4B. Tingnan kung may gumagamit na ng username
+// 4B. Check if the username is already used
 // -----------------------------------------------------
 
 async function isUsernameTaken(username) {
@@ -421,13 +461,13 @@ async function isUsernameTaken(username) {
 
     if (error) throw error;
 
-    // Kapag may nakuhang kahit isang row, taken na ang username
+    // At least one row found = username is taken
     return data.length > 0;
 
 }
 
 // -----------------------------------------------------
-// 4C. Gawing malinaw na message ang error ni Supabase
+// 4C. Turn a Supabase sign-up error into a clear message
 // -----------------------------------------------------
 
 function getSignUpProblem(error) {
@@ -452,9 +492,9 @@ function getSignUpProblem(error) {
 
     }
 
-    // DUPLICATE USERNAME (galing sa database)
-    // Kapag nag-fail ang pag-save sa UsersTable (halimbawa dahil
-    // unique ang Username), ganito ang sinasabi ni Supabase.
+    // DUPLICATE USERNAME (from the database)
+    // When saving to UsersTable fails (for example, because Username
+    // must be unique), Supabase only says "Database error saving new user".
     if (
         message.includes("database error saving new user") ||
         message.includes("username_unique")
@@ -470,19 +510,18 @@ function getSignUpProblem(error) {
 
     }
 
-    // MAHINANG PASSWORD
+    // WEAK PASSWORD
     if (code === "weak_password") {
 
         return {
             fieldId: "password",
             title: "Weak password",
-            message:
-                "Choose a stronger password. Mix letters, numbers, and symbols."
+            message: "Choose a stronger password. Mix letters, numbers, and symbols."
         };
 
     }
 
-    // MALING EMAIL ADDRESS
+    // INVALID EMAIL ADDRESS
     if (code === "email_address_invalid") {
 
         return {
@@ -493,30 +532,8 @@ function getSignUpProblem(error) {
 
     }
 
-    // SOBRANG DAMING SUBOK
-    if (error?.status === 429 || code.includes("rate_limit")) {
-
-        return {
-            fieldId: null,
-            title: "Too many attempts",
-            message: "Wait a few minutes, then try creating your account again."
-        };
-
-    }
-
-    // WALANG INTERNET
-    if (message.includes("failed to fetch")) {
-
-        return {
-            fieldId: null,
-            title: "No connection",
-            message: "Check your internet connection, then try again."
-        };
-
-    }
-
-    // IBA PANG ERROR
-    return {
+    // NO INTERNET / TOO MANY ATTEMPTS / ANYTHING ELSE
+    return getCommonProblem(error) ?? {
         fieldId: null,
         title: "Account not created",
         message: error?.message || "Something went wrong. Try again."
@@ -525,7 +542,7 @@ function getSignUpProblem(error) {
 }
 
 // -----------------------------------------------------
-// 4D. Ikabit ang lahat sa Create Account form
+// 4D. Connect everything to the create account form
 // -----------------------------------------------------
 
 function setupCreateAccount() {
@@ -533,7 +550,7 @@ function setupCreateAccount() {
     const form = document.getElementById("createAccountForm");
     const createAccountButton = document.getElementById("createAccountButton");
 
-    // Kung wala ang form, ibig sabihin hindi ito ang Create Account page
+    // Not on the create account page
     if (!form || !createAccountButton) return;
 
     setupPasswordToggle("password", "togglePassword");
@@ -543,8 +560,8 @@ function setupCreateAccount() {
 
         event.preventDefault();
 
-        // STEP 1: Kunin ang lahat ng laman ng form
-        // (ang pangalan ng bawat key ay kapareho ng id ng input)
+        // STEP 1: Read the form
+        // (each key has the same name as the input's id)
         const account = {
             firstName: getValue("firstName"),
             lastName: getValue("lastName"),
@@ -554,12 +571,12 @@ function setupCreateAccount() {
             position: getValue("position"),
             username: getValue("username"),
             email: getValue("email"),
-            // Hindi tine-trim ang password (pwedeng may space talaga)
+            // Passwords are not trimmed (spaces can be part of a password)
             password: document.getElementById("password").value,
             confirmPassword: document.getElementById("confirmPassword").value
         };
 
-        // STEP 2: I-check kung tama ang laman ng form
+        // STEP 2: Check the form
         const formProblem = validateAccount(account);
 
         if (formProblem) {
@@ -571,7 +588,7 @@ function setupCreateAccount() {
 
         try {
 
-            // STEP 3: I-check kung taken na ang username
+            // STEP 3: Check if the username is taken
             if (await isUsernameTaken(account.username)) {
 
                 await showFormProblem({
@@ -586,7 +603,7 @@ function setupCreateAccount() {
 
             }
 
-            // STEP 4: I-register ang user sa Supabase
+            // STEP 4: Register the user in Supabase
             const { data, error } = await db.auth.signUp({
                 email: account.email,
                 password: account.password,
@@ -605,10 +622,9 @@ function setupCreateAccount() {
 
             if (error) throw error;
 
-            // STEP 5: I-check ang "tagong" duplicate email
-            // Kapag naka-ON ang "Confirm email" sa Supabase, HINDI ito
-            // nagbibigay ng error kapag existing na ang email.
-            // Sa halip, walang laman ang "identities" ng user.
+            // STEP 5: Check for a "hidden" duplicate email
+            // When "Confirm email" is ON, Supabase does NOT return an error
+            // for an existing email. Instead, "identities" comes back empty.
             if (data.user && data.user.identities?.length === 0) {
 
                 await showFormProblem({
@@ -623,10 +639,13 @@ function setupCreateAccount() {
 
             }
 
-            // STEP 6: Success!
+            // STEP 6: Success
             if (data.session) {
 
-                // Naka-OFF ang email confirmation: pwede nang mag-login agad
+                // Email confirmation is OFF: the user can log in right away.
+                // Sign out so they log in on the login page themselves.
+                await db.auth.signOut();
+
                 await showMessage(
                     "success",
                     "Account created",
@@ -637,7 +656,7 @@ function setupCreateAccount() {
 
             } else {
 
-                // Naka-ON ang email confirmation: kailangan munang i-confirm
+                // Email confirmation is ON: they must confirm first
                 await showMessage(
                     "success",
                     "Check your email",
@@ -656,7 +675,7 @@ function setupCreateAccount() {
 
         } finally {
 
-            // Laging ibabalik sa dati ang button, success man o error
+            // Always bring the button back, success or error
             setButtonLoading(createAccountButton, false);
 
         }
@@ -671,18 +690,17 @@ function setupCreateAccount() {
 // =====================================================
 
 // -----------------------------------------------------
-// 5A. Gawing malinaw na message ang login error
+// 5A. Turn a login error into a clear message
 // -----------------------------------------------------
-// Magbabalik ng { fieldId, title, message } para sa message box
 
 function getLoginProblem(error) {
 
     const code = error?.code ?? "";
     const message = (error?.message ?? "").toLowerCase();
 
-    // MALING EMAIL O PASSWORD
-    // (Sadyang hindi sinasabi ni Supabase kung alin sa dalawa ang mali,
-    //  para hindi malaman ng iba kung may account ang isang email.)
+    // WRONG EMAIL OR PASSWORD
+    // (Supabase never says which one is wrong, on purpose,
+    //  so nobody can find out which emails have accounts.)
     if (code === "invalid_credentials" || message.includes("invalid login credentials")) {
 
         return {
@@ -695,7 +713,7 @@ function getLoginProblem(error) {
 
     }
 
-    // HINDI PA NA-CONFIRM ANG EMAIL
+    // EMAIL NOT CONFIRMED YET
     if (code === "email_not_confirmed" || message.includes("email not confirmed")) {
 
         return {
@@ -708,30 +726,8 @@ function getLoginProblem(error) {
 
     }
 
-    // SOBRANG DAMING SUBOK
-    if (error?.status === 429 || code.includes("rate_limit")) {
-
-        return {
-            fieldId: null,
-            title: "Too many attempts",
-            message: "Wait a few minutes, then try logging in again."
-        };
-
-    }
-
-    // WALANG INTERNET
-    if (message.includes("failed to fetch")) {
-
-        return {
-            fieldId: null,
-            title: "No connection",
-            message: "Check your internet connection, then try again."
-        };
-
-    }
-
-    // IBA PANG ERROR
-    return {
+    // NO INTERNET / TOO MANY ATTEMPTS / ANYTHING ELSE
+    return getCommonProblem(error) ?? {
         fieldId: null,
         title: "Login failed",
         message: error?.message || "Something went wrong. Try again."
@@ -740,7 +736,7 @@ function getLoginProblem(error) {
 }
 
 // -----------------------------------------------------
-// 5B. Ikabit ang lahat sa Login form
+// 5B. Connect everything to the login form
 // -----------------------------------------------------
 
 function setupLogin() {
@@ -749,21 +745,20 @@ function setupLogin() {
     const loginButton = document.getElementById("loginButton");
     const loginMessage = document.getElementById("loginMessage");
 
-    // Kung wala ang form, ibig sabihin hindi ito ang Login page
+    // Not on the login page
     if (!loginForm || !loginButton) return;
 
-    // SHOW / HIDE ng password sa Login page
     setupPasswordToggle("password", "togglePassword");
 
     loginForm.addEventListener("submit", async function (event) {
 
         event.preventDefault();
 
-        // STEP 1: Kunin ang email at password
+        // STEP 1: Read email and password
         const email = getValue("email");
         const password = document.getElementById("password").value;
 
-        // STEP 2: I-check kung may laman
+        // STEP 2: Make sure both are filled in
         if (!email || !password) {
 
             await showFormProblem({
@@ -781,7 +776,7 @@ function setupLogin() {
 
         try {
 
-            // STEP 3: Mag-login sa Supabase
+            // STEP 3: Log in with Supabase
             const { error } = await db.auth.signInWithPassword({
                 email: email,
                 password: password
@@ -789,7 +784,7 @@ function setupLogin() {
 
             if (error) throw error;
 
-            // STEP 4: Success, lipat sa Dashboard
+            // STEP 4: Success, go to the dashboard
             if (loginMessage) loginMessage.textContent = "Login successful. Redirecting...";
             window.location.href = "dashboard.html";
 
@@ -797,8 +792,8 @@ function setupLogin() {
 
             logError("LOGIN", error);
 
-            // Ibalik muna ang button bago ipakita ang warning
-            // (kapag success, hindi na kailangan dahil lilipat na ng page)
+            // Bring the button back first, then show the warning
+            // (not needed on success, because the page changes)
             setButtonLoading(loginButton, false);
 
             await showFormProblem(getLoginProblem(error), "warning");
@@ -814,19 +809,88 @@ function setupLogin() {
 // 6. DASHBOARD PAGE
 // =====================================================
 
-// Mga column ng table.
-// key   = pangalan ng column sa Supabase
-// label = ipapakita sa user (gamit sa mobile view)
+// -----------------------------------------------------
+// 6A. Table columns
+// -----------------------------------------------------
+// key       = column name in the Supabase "Transactions" table
+// label     = column name shown to the user (also used on phones)
+// className = CSS class for the cell (see Style.css)
+// format    = (optional) changes how the value looks
+
 const TRANSACTION_COLUMNS = [
-    { key: "Date",       label: "Date" },
-    { key: "Payroll",    label: "Payroll" },
-    { key: "Sender",     label: "Sender" },
-    { key: "Amount",     label: "Amount" },
-    { key: "Reciever",   label: "Receiver" }, // "Reciever" ang spelling sa database mo
-    { key: "Purpose",    label: "Purpose/Definition" }
+    { key: "Date",     label: "Date",               className: "cell-date",     format: formatDate },
+    { key: "Payroll",  label: "Payroll",            className: "cell-payroll",  format: formatPayroll },
+    { key: "Sender",   label: "Sender",             className: "cell-sender" },
+    { key: "Amount",   label: "Amount",             className: "cell-amount",   format: formatPeso },
+    { key: "Reciever", label: "Receiver",           className: "cell-receiver" }, // "Reciever" is how it's spelled in the database
+    { key: "Purpose",  label: "Purpose/Definition", className: "cell-purpose" }
 ];
 
-// Isang row lang na may message (halimbawa: "No transactions found.")
+// -----------------------------------------------------
+// 6B. Formatting helpers
+// -----------------------------------------------------
+
+// 1500 -> "₱1,500.00"
+function formatPeso(value) {
+
+    if (value === null || value === "" || isNaN(Number(value))) return "";
+
+    return new Intl.NumberFormat("en-PH", {
+        style: "currency",
+        currency: "PHP"
+    }).format(Number(value));
+
+}
+
+// "2026-11-20" -> "Nov 20, 2026"
+function formatDate(value) {
+
+    if (!value) return "";
+
+    // Adding "T00:00:00" reads the date in local time (not UTC)
+    const date = new Date(`${value}T00:00:00`);
+
+    if (isNaN(date)) return value;
+
+    return new Intl.DateTimeFormat("en-PH", {
+        month: "short",
+        day: "numeric",
+        year: "numeric"
+    }).format(date);
+
+}
+
+// 1 -> "First cutoff", 2 -> "Second cutoff"
+function formatPayroll(value) {
+
+    const payrollNames = {
+        "1": "First cutoff",
+        "2": "Second cutoff"
+    };
+
+    return payrollNames[String(value)] ?? value;
+
+}
+
+// Today's date as "YYYY-MM-DD" in local time
+// (toISOString() uses UTC, which can be a day behind in the Philippines)
+function getTodayDate() {
+
+    const today = new Date();
+
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+    const day = String(today.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+
+}
+
+// -----------------------------------------------------
+// 6C. Load transactions into the table
+// -----------------------------------------------------
+
+// Shows one row with a message, like "No transactions yet."
 function showTableMessage(tableBody, text) {
 
     tableBody.innerHTML = `
@@ -837,13 +901,25 @@ function showTableMessage(tableBody, text) {
 
 }
 
+// Updates "Total records" and the text under "Recent transactions"
+function updateRecordCount(count) {
 
-// =====================================
-// LOAD USER'S OWN TRANSACTIONS
-// =====================================
+    const totalRecords = document.getElementById("totalRecords");
+    const recordSummary = document.getElementById("recordSummary");
 
+    if (totalRecords) totalRecords.textContent = count;
+
+    if (recordSummary) {
+        recordSummary.textContent =
+            count === 1 ? "1 transaction recorded" : `${count} transactions recorded`;
+    }
+
+}
+
+// userId = the logged-in user's id (only their own records are shown)
 async function loadTransactions(tableBody, userId) {
 
+    // Newest first
     const { data, error } = await db
         .from("Transactions")
         .select("*")
@@ -852,8 +928,10 @@ async function loadTransactions(tableBody, userId) {
 
     if (error) throw error;
 
-    if (!data || data.length === 0) {
-        showTableMessage(tableBody, "No transactions found.");
+    updateRecordCount(data.length);
+
+    if (data.length === 0) {
+        showTableMessage(tableBody, "No transactions yet. Click \"Add transaction\" to record your first one.");
         return;
     }
 
@@ -866,9 +944,11 @@ async function loadTransactions(tableBody, userId) {
         TRANSACTION_COLUMNS.forEach(function (column) {
 
             const cell = document.createElement("td");
+            const value = transaction[column.key];
 
+            cell.className = column.className;
             cell.setAttribute("data-label", column.label);
-            cell.textContent = transaction[column.key] ?? "";
+            cell.textContent = column.format ? column.format(value) : (value ?? "");
 
             row.appendChild(cell);
 
@@ -880,49 +960,383 @@ async function loadTransactions(tableBody, userId) {
 
 }
 
+// -----------------------------------------------------
+// 6D. User info (welcome message, avatar, today's date)
+// -----------------------------------------------------
 
-function setupDashboard() {
+function showUserInfo(user) {
 
-    const tableBody = document.getElementById("transactionTableBody");
+    const welcomeTitle = document.getElementById("welcomeTitle");
+    const userAvatar = document.getElementById("userAvatar");
+    const todayLabel = document.getElementById("todayLabel");
 
-    // Kung wala ang table, ibig sabihin hindi ito ang Dashboard page
-    if (!tableBody) return;
+    // Saved during sign up (see section 4D, STEP 4)
+    const firstName = user.user_metadata?.firstName;
 
-    (async function () {
+    if (welcomeTitle && firstName) {
+        welcomeTitle.textContent = `Welcome back, ${firstName}!`;
+    }
 
-        try {
+    if (userAvatar) {
+        userAvatar.textContent = (firstName || user.email || "U").charAt(0).toUpperCase();
+    }
 
-            // Tingnan kung naka-login ang user
-            const { data, error } = await db.auth.getSession();
+    if (todayLabel) {
+        todayLabel.textContent = new Intl.DateTimeFormat("en-PH", {
+            weekday: "long",
+            month: "long",
+            day: "numeric"
+        }).format(new Date());
+    }
 
-            if (error) throw error;
+}
 
-            if (!data.session) {
-                // Hindi naka-login, ibalik sa Login page
-                window.location.replace("index.html");
-                return;
-            }
+// -----------------------------------------------------
+// 6E. Sidebar (slide-in menu on tablets and phones)
+// -----------------------------------------------------
 
-            await loadTransactions(tableBody, data.session.user.id);
+function setupSidebar() {
 
-        } catch (error) {
+    const sidebar = document.getElementById("sidebar");
+    const openButton = document.getElementById("openSidebar");
+    const closeButton = document.getElementById("closeSidebar");
+    const backdrop = document.getElementById("sidebarBackdrop");
 
-            logError("DASHBOARD", error);
-            showTableMessage(tableBody, "Failed to load transactions. Refresh the page to try again.");
+    if (!sidebar || !openButton || !closeButton || !backdrop) return;
+
+    // Must match the 960px breakpoint in Style.css
+    const desktopScreen = window.matchMedia("(min-width: 961px)");
+
+    function openSidebar() {
+        sidebar.classList.add("open");
+        backdrop.classList.add("visible");
+        document.body.classList.add("no-scroll");
+        openButton.setAttribute("aria-expanded", "true");
+        closeButton.focus();
+    }
+
+    function closeSidebar() {
+        sidebar.classList.remove("open");
+        backdrop.classList.remove("visible");
+        document.body.classList.remove("no-scroll");
+        openButton.setAttribute("aria-expanded", "false");
+    }
+
+    openButton.addEventListener("click", openSidebar);
+    backdrop.addEventListener("click", closeSidebar);
+
+    closeButton.addEventListener("click", function () {
+        closeSidebar();
+        openButton.focus();
+    });
+
+    // Close the menu after picking a link
+    sidebar.querySelectorAll(".nav-link").forEach(function (link) {
+        link.addEventListener("click", closeSidebar);
+    });
+
+    // Escape key closes the menu
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && sidebar.classList.contains("open") && !isMessageOpen()) {
+            closeSidebar();
+            openButton.focus();
+        }
+    });
+
+    // Reset the menu when the screen becomes desktop size
+    desktopScreen.addEventListener("change", function (event) {
+        if (event.matches) closeSidebar();
+    });
+
+}
+
+// -----------------------------------------------------
+// 6F. Log out
+// -----------------------------------------------------
+
+function setupLogout() {
+
+    const logoutButton = document.getElementById("logoutButton");
+
+    if (!logoutButton) return;
+
+    logoutButton.addEventListener("click", async function () {
+
+        const { error } = await db.auth.signOut();
+
+        if (error) {
+            logError("LOGOUT", error);
+            await showMessage("error", "Log out failed", "Refresh the page, then try again.");
+            return;
+        }
+
+        window.location.replace("index.html");
+
+    });
+
+}
+
+// -----------------------------------------------------
+// 6G. Add transaction modal
+// -----------------------------------------------------
+
+// Checks the transaction form.
+// Returns { fieldId, title, message } or null.
+function validateTransaction(transaction) {
+
+    const requiredFields = [
+        { fieldId: "transactionDate", value: transaction.date,     name: "date" },
+        { fieldId: "payroll",         value: transaction.payroll,  name: "payroll" },
+        { fieldId: "sender",          value: transaction.sender,   name: "sender" },
+        { fieldId: "receiver",        value: transaction.receiver, name: "receiver" },
+        { fieldId: "amount",          value: transaction.amount,   name: "amount" },
+        { fieldId: "transactionType", value: transaction.type,     name: "transaction type" },
+        { fieldId: "purpose",         value: transaction.purpose,  name: "purpose" }
+    ];
+
+    for (const field of requiredFields) {
+
+        if (!field.value) {
+
+            return {
+                fieldId: field.fieldId,
+                title: "Missing information",
+                message: `Please enter the ${field.name}.`
+            };
 
         }
 
-    })();
+    }
+
+    if (Number(transaction.amount) <= 0) {
+
+        return {
+            fieldId: "amount",
+            title: "Invalid amount",
+            message: "Enter an amount greater than ₱0.00."
+        };
+
+    }
+
+    return null;
+
+}
+
+// Turns a database error into a clear message
+function getSaveProblem(error) {
+
+    // 42501 = blocked by Row Level Security
+    if (error?.code === "42501") {
+
+        return {
+            fieldId: null,
+            title: "Not allowed to save",
+            message:
+                "Your account can't add transactions yet.\n" +
+                "Add an INSERT policy to the Transactions table in Supabase."
+        };
+
+    }
+
+    return getCommonProblem(error) ?? {
+        fieldId: null,
+        title: "Transaction not saved",
+        message: error?.message || "Something went wrong. Try again."
+    };
+
+}
+
+function setupTransactionModal(tableBody, userId) {
+
+    const modal = document.getElementById("transactionModal");
+    const form = document.getElementById("transactionForm");
+    const openButton = document.getElementById("addTransactionBtn");
+    const closeButton = document.getElementById("closeTransactionModal");
+    const cancelButton = document.getElementById("cancelTransaction");
+    const saveButton = document.getElementById("saveTransactionBtn");
+    const dateInput = document.getElementById("transactionDate");
+    const todayToggle = document.getElementById("todayDateToggle");
+    const dateHint = document.getElementById("dateHint");
+
+    if (!modal || !form || !openButton || !closeButton || !cancelButton || !saveButton || !dateInput || !todayToggle || !dateHint) return;
+
+    // "Today" switch: ON = today's date, OFF = pick a date
+    function updateDateField() {
+
+        if (todayToggle.checked) {
+
+            dateInput.value = getTodayDate();
+            dateInput.disabled = true;
+            dateHint.textContent = "Using today's date.";
+
+        } else {
+
+            dateInput.disabled = false;
+            dateHint.textContent = "Pick the date of the transaction.";
+            dateInput.focus();
+
+        }
+
+    }
+
+    function openModal() {
+        form.reset();
+        updateDateField();
+        modal.hidden = false;
+        document.body.classList.add("no-scroll");
+        focusField("payroll");
+    }
+
+    function closeModal() {
+        modal.hidden = true;
+        document.body.classList.remove("no-scroll");
+        openButton.focus();
+    }
+
+    openButton.addEventListener("click", openModal);
+    closeButton.addEventListener("click", closeModal);
+    cancelButton.addEventListener("click", closeModal);
+    todayToggle.addEventListener("change", updateDateField);
+
+    // Escape key closes the modal (but not while a message box is open)
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !modal.hidden && !isMessageOpen()) {
+            closeModal();
+        }
+    });
+
+    // Save the transaction
+    form.addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        // STEP 1: Read the form
+        const transaction = {
+            date: dateInput.value,
+            payroll: getValue("payroll"),
+            sender: getValue("sender"),
+            receiver: getValue("receiver"),
+            amount: getValue("amount"),
+            type: getValue("transactionType"),
+            purpose: getValue("purpose")
+        };
+
+        // STEP 2: Check the form
+        const problem = validateTransaction(transaction);
+
+        if (problem) {
+            await showFormProblem(problem, "warning");
+            return;
+        }
+
+        setButtonLoading(saveButton, true, "Saving...");
+
+        try {
+
+            // STEP 3: Make sure the user is still logged in
+            const { data: userData, error: userError } = await db.auth.getUser();
+
+            if (userError || !userData.user) {
+
+                await showMessage(
+                    "warning",
+                    "Session expired",
+                    "Your login session has ended. Log in again to continue."
+                );
+
+                window.location.replace("index.html");
+                return;
+
+            }
+
+            // STEP 4: Save to Supabase
+            // (left side = column name in the database)
+            const { error } = await db.from("Transactions").insert({
+                Date: transaction.date,
+                Payroll: Number(transaction.payroll),
+                Sender: transaction.sender,
+                Amount: Number(transaction.amount),
+                Reciever: transaction.receiver,
+                Purpose: transaction.purpose,
+                Transaction: transaction.type
+                // UserID is not added here on purpose:
+                // Supabase fills it in automatically with auth.uid().
+            });
+
+            if (error) throw error;
+
+            // STEP 5: Close the modal and refresh the table
+            setButtonLoading(saveButton, false);
+            closeModal();
+
+            loadTransactions(tableBody, userId).catch(function (loadError) {
+                logError("RELOAD TRANSACTIONS", loadError);
+            });
+
+            await showMessage("success", "Transaction saved", "Your transaction was added to your records.");
+
+        } catch (error) {
+
+            logError("SAVE TRANSACTION", error);
+
+            setButtonLoading(saveButton, false);
+            await showFormProblem(getSaveProblem(error));
+
+        }
+
+    });
+
+}
+
+// -----------------------------------------------------
+// 6H. Start the dashboard
+// -----------------------------------------------------
+
+async function setupDashboard() {
+
+    const tableBody = document.getElementById("transactionTableBody");
+
+    // Not on the dashboard page
+    if (!tableBody) return;
+
+    // These work even before the data loads
+    setupSidebar();
+    setupLogout();
+
+    try {
+
+        // Only logged-in users can see the dashboard
+        const { data, error } = await db.auth.getSession();
+
+        if (error) throw error;
+
+        if (!data.session) {
+            window.location.replace("index.html");
+            return;
+        }
+
+        const user = data.session.user;
+
+        showUserInfo(user);
+        setupTransactionModal(tableBody, user.id);
+
+        await loadTransactions(tableBody, user.id);
+
+    } catch (error) {
+
+        logError("DASHBOARD", error);
+        showTableMessage(tableBody, "Failed to load transactions. Refresh the page to try again.");
+
+    }
 
 }
 
 
 // =====================================================
-// 7. PAGSISIMULA NG APP
+// 7. START THE APP
 // =====================================================
-// Pagka-load ng page, patatakbuhin ang lahat ng setup.
-// Bawat setup ay kusang hihinto kung wala sa tamang page,
-// kaya ligtas itong gamitin sa lahat ng HTML file mo.
+// Runs every setup when the page loads.
+// Each setup stops by itself if it's not on its page.
 
 document.addEventListener("DOMContentLoaded", function () {
 
@@ -930,265 +1344,4 @@ document.addEventListener("DOMContentLoaded", function () {
     setupCreateAccount();
     setupDashboard();
 
-});
-
-
-
-
-// =====================================
-// ADD TRANSACTION MODAL
-// =====================================
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const addTransactionBtn = document.getElementById("addTransactionBtn");
-    const transactionModal = document.getElementById("transactionModal");
-
-    const closeTransactionModal = document.getElementById("closeTransactionModal");
-    const cancelTransaction = document.getElementById("cancelTransaction");
-
-    const transactionForm = document.getElementById("transactionForm");
-
-    const todayDateToggle = document.getElementById("todayDateToggle");
-    const transactionDate = document.getElementById("transactionDate");
-    const dateHint = document.getElementById("dateHint");
-
-
-    // =====================================
-    // GET TODAY'S DATE
-    // =====================================
-
-    function getTodayDate() {
-
-        const today = new Date();
-
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, "0");
-        const day = String(today.getDate()).padStart(2, "0");
-
-        return `${year}-${month}-${day}`;
-    }
-
-
-    // =====================================
-    // OPEN MODAL
-    // =====================================
-
-    function openTransactionModal() {
-
-        transactionModal.classList.add("active");
-
-        document.body.style.overflow = "hidden";
-
-        // Default: Today's date
-        todayDateToggle.checked = true;
-
-        transactionDate.value = getTodayDate();
-        transactionDate.disabled = true;
-
-        dateHint.textContent = "Automatically using today's date.";
-    }
-
-
-    // =====================================
-    // CLOSE MODAL
-    // =====================================
-
-    function closeModal() {
-
-        transactionModal.classList.remove("active");
-
-        document.body.style.overflow = "";
-
-        transactionForm.reset();
-
-        // Restore default date settings
-        todayDateToggle.checked = true;
-        transactionDate.value = getTodayDate();
-        transactionDate.disabled = true;
-
-        dateHint.textContent = "Automatically using today's date.";
-    }
-
-
-    // =====================================
-    // BUTTON EVENTS
-    // =====================================
-
-    addTransactionBtn.addEventListener("click", openTransactionModal);
-
-    closeTransactionModal.addEventListener("click", closeModal);
-
-    cancelTransaction.addEventListener("click", closeModal);
-
-
-    // =====================================
-    // DATE TOGGLE
-    // =====================================
-
-    todayDateToggle.addEventListener("change", function () {
-
-        if (this.checked) {
-
-            // Automatic today's date
-            transactionDate.value = getTodayDate();
-            transactionDate.disabled = true;
-
-            dateHint.textContent = "Automatically using today's date.";
-
-        } else {
-
-            // Allow manual date selection
-            transactionDate.disabled = false;
-
-            dateHint.textContent = "Select your preferred transaction date.";
-
-        }
-
-    });
-
-
-    // =====================================
-    // CLOSE WHEN CLICKING OUTSIDE
-    // =====================================
-
-    transactionModal.addEventListener("click", function (event) {
-
-        if (event.target === transactionModal) {
-            closeModal();
-        }
-
-    });
-
-
-    // =====================================
-    // CLOSE USING ESCAPE KEY
-    // =====================================
-
-    document.addEventListener("keydown", function (event) {
-
-        if (
-            event.key === "Escape" &&
-            transactionModal.classList.contains("active")
-        ) {
-            closeModal();
-        }
-
-    });
-
-
-    
-    // =====================================
-    // SAVE TRANSACTION TO SUPABASE
-    // =====================================
-
-    transactionForm.addEventListener("submit", async function (event) {
-
-        event.preventDefault();
-
-        const saveButton = transactionForm.querySelector(
-            ".save-transaction-btn"
-        );
-
-        try {
-
-            // =====================================
-            // CHECK CURRENT USER
-            // =====================================
-
-            saveButton.disabled = true;
-            saveButton.textContent = "Saving...";
-
-            const { data: userData, error: userError } =
-                await db.auth.getUser();
-
-            if (userError) {
-                throw userError;
-            }
-
-            const user = userData.user;
-
-            if (!user) {
-                alert("Your session has expired. Please log in again.");
-                window.location.href = "index.html";
-                return;
-            }
-
-
-            // =====================================
-            // GET FORM VALUES
-            // =====================================
-
-            const transactionData = {
-
-                "Date": todayDateToggle.checked
-                    ? getTodayDate()
-                    : transactionDate.value,
-
-                "Payroll": Number(
-                    document.getElementById("payroll").value
-                ),
-
-                "Sender": document.getElementById("sender").value.trim(),
-
-                "Amount": Number(
-                    document.getElementById("amount").value
-                ),
-
-                "Reciever": document.getElementById("receiver").value.trim(),
-
-                "Purpose": document.getElementById("purpose").value.trim(),
-
-                "Transaction": document.getElementById("transactionType").value
-
-                // Do not manually add UserID.
-                // Supabase uses auth.uid() as the column default.
-            };
-
-
-            // =====================================
-            // INSERT INTO SUPABASE
-            // =====================================
-
-            const { data, error } = await db
-                .from("Transactions")
-                .insert([transactionData])
-                .select();
-
-            if (error) {
-                throw error;
-            }
-
-
-            // =====================================
-            // SUCCESS
-            // =====================================
-
-            console.log("Transaction saved:", data);
-
-            alert("Transaction successfully saved!");
-
-            closeModal();
-
-            // Reload dashboard to show the new record
-            window.location.reload();
-
-
-        } catch (error) {
-
-            console.error("Save Transaction Error:", error);
-
-            alert(
-                "Unable to save transaction:\n\n" +
-                error.message
-            );
-
-        } finally {
-
-            saveButton.disabled = false;
-            saveButton.textContent = "Save Transaction";
-
-        }
-
-    });
 });
