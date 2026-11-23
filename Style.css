@@ -515,6 +515,69 @@ svg {
     background: var(--surface);
 }
 
+/* =====================================================
+   BANKS & E-WALLETS
+   ===================================================== */
+
+.banks-panel {
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+}
+
+.banks-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--border);
+}
+
+.banks-panel-header h3 { font-size: 18px; font-weight: 800; }
+.banks-panel-header p { color: var(--text-secondary); font-size: 13px; }
+.banks-content { padding: 24px; }
+.banks-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 16px; }
+
+.bank-card {
+    min-width: 0;
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+}
+
+.bank-card::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    margin-bottom: 16px;
+    border-radius: 999px;
+    background: var(--primary);
+}
+
+.bank-name { overflow-wrap: anywhere; font-size: 16px; font-weight: 700; }
+.bank-balance-label { margin-top: 16px; color: var(--text-secondary); font-size: 12px; }
+.bank-balance { margin-top: 3px; font-size: 23px; font-weight: 800; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+
+.banks-empty-state {
+    display: flex;
+    min-height: 210px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+}
+
+.banks-empty-icon { display: grid; width: 56px; height: 56px; place-items: center; margin-bottom: 14px; border-radius: 50%; background: var(--brand-tint); color: var(--primary); }
+.banks-empty-icon svg { width: 27px; height: 27px; }
+.banks-empty-state h4 { font-size: 17px; font-weight: 800; }
+.banks-empty-state p { max-width: 430px; margin-top: 5px; color: var(--text-secondary); font-size: 13px; }
+
 .transactions-header {
     display: flex;
     align-items: center;
@@ -1086,9 +1149,14 @@ select.input {
         padding: 18px 16px;
     }
 
+    .banks-panel-header { padding: 18px 16px; }
+    .banks-content { padding: 16px; }
+
     .transactions-header .button {
         width: 100%;
     }
+
+    .banks-panel-header .button { width: 100%; }
 
     /* Table rows turn into cards */
     .data-table thead {

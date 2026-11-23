@@ -1331,6 +1331,138 @@ async function setupDashboard() {
 
 }
 
+// -----------------------------------------------------
+// 6I. Banks & e-wallets page
+// -----------------------------------------------------
+
+async function setupBanksPage() {
+
+    const content = document.getElementById("banksContent");
+    if (!content) return;
+
+    setupSidebar();
+    setupLogout();
+
+    const { data, error } = await db.auth.getSession();
+    if (error) {
+        logError("BANKS SESSION", error);
+        content.textContent = "Unable to load your accounts. Refresh the page to try again.";
+        return;
+    }
+
+    if (!data.session) {
+        window.location.replace("index.html");
+        return;
+    }
+
+    const user = data.session.user;
+    showUserInfo(user);
+
+    // No bank-account table exists in the current project schema. Until one is
+    // defined, keep these records local and partitioned by the authenticated user.
+    const storageKey = `isave-bank-accounts:${user.id}`;
+    const nameInput = document.getElementById("bankName");
+    const balanceInput = document.getElementById("bankBalance");
+    const modal = document.getElementById("bankModal");
+    const form = document.getElementById("bankForm");
+    const addButton = document.getElementById("addBankButton");
+    const closeButton = document.getElementById("closeBankModal");
+    const cancelButton = document.getElementById("cancelBank");
+    const totalBalance = document.getElementById("totalBalance");
+
+    function readAccounts() {
+        try {
+            const accounts = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            return Array.isArray(accounts) ? accounts.filter(function (account) {
+                return account && typeof account.name === "string" && Number.isFinite(Number(account.balance)) && Number(account.balance) >= 0;
+            }) : [];
+        } catch (storageError) {
+            logError("READ BANK ACCOUNTS", storageError);
+            return [];
+        }
+    }
+
+    function renderAccounts() {
+        const accounts = readAccounts();
+        const total = accounts.reduce(function (sum, account) { return sum + Number(account.balance); }, 0);
+        if (totalBalance) totalBalance.textContent = formatPeso(total);
+        content.replaceChildren();
+
+        if (accounts.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "banks-empty-state";
+            empty.innerHTML = '<div class="banks-empty-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18M5 10V7l7-4 7 4v3M5 10v9m4-9v9m6-9v9m4-9v9M3 21h18"/></svg></div><h4>No E-Wallets Yet</h4><p>Add your banks and e-wallets to easily view and manage your available balances in one place.</p>';
+            content.appendChild(empty);
+            return;
+        }
+
+        const grid = document.createElement("div");
+        grid.className = "banks-grid";
+        accounts.forEach(function (account) {
+            const card = document.createElement("article");
+            card.className = "bank-card";
+            const name = document.createElement("h4");
+            name.className = "bank-name";
+            name.textContent = account.name;
+            const label = document.createElement("p");
+            label.className = "bank-balance-label";
+            label.textContent = "Available balance";
+            const balance = document.createElement("p");
+            balance.className = "bank-balance";
+            balance.textContent = formatPeso(Number(account.balance));
+            card.append(name, label, balance);
+            grid.appendChild(card);
+        });
+        content.appendChild(grid);
+    }
+
+    function formatPeso(amount) {
+        return new Intl.NumberFormat("en-PH", { style: "currency", currency: "PHP" }).format(amount);
+    }
+
+    function closeModal() {
+        modal.hidden = true;
+        document.body.classList.remove("no-scroll");
+        addButton.focus();
+    }
+
+    addButton.addEventListener("click", function () {
+        form.reset();
+        modal.hidden = false;
+        document.body.classList.add("no-scroll");
+        nameInput.focus();
+    });
+    closeButton.addEventListener("click", closeModal);
+    cancelButton.addEventListener("click", closeModal);
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape" && !modal.hidden && !isMessageOpen()) closeModal();
+    });
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        const name = nameInput.value.trim();
+        const balance = Number(balanceInput.value);
+        if (!name || !Number.isFinite(balance) || balance < 0) {
+            await showMessage("warning", "Check account details", "Enter an account name and a valid balance of zero or more.");
+            return;
+        }
+
+        const accounts = readAccounts();
+        accounts.push({ name: name, balance: balance });
+        try {
+            localStorage.setItem(storageKey, JSON.stringify(accounts));
+        } catch (storageError) {
+            logError("SAVE BANK ACCOUNT", storageError);
+            await showMessage("error", "Account not saved", "Your browser could not save this account. Check available storage and try again.");
+            return;
+        }
+        closeModal();
+        renderAccounts();
+    });
+
+    renderAccounts();
+}
+
 
 // =====================================================
 // 7. START THE APP
@@ -1343,5 +1475,6 @@ document.addEventListener("DOMContentLoaded", function () {
     setupLogin();
     setupCreateAccount();
     setupDashboard();
+    setupBanksPage();
 
 });
