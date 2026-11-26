@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loans | iSave</title>
+    <link rel="stylesheet" href="Style.css">
+</head>
+<body>
+<div class="app">
+    <aside class="sidebar" id="sidebar" aria-label="Main menu">
+        <div class="sidebar-header"><div class="brand"><div class="brand-logo" aria-hidden="true">i</div><span class="brand-name">iSave</span></div><button type="button" id="closeSidebar" class="close-sidebar" aria-label="Close menu"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Dashboard</a>
+            <a href="dashboard.html" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Transactions</a>
+            <a href="loans.html" class="nav-link active" aria-current="page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15v2M12 10v7M17 6v11"/></svg>Loans</a>
+            <a href="banks.html" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10h18M5 10V7l7-4 7 4v3M5 10v9m4-9v9m6-9v9m4-9v9M3 21h18"/></svg>Banks</a>
+            <a href="#" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></svg>Settings</a>
+        </nav>
+        <div class="sidebar-footer"><button type="button" id="logoutButton" class="nav-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></svg>Log out</button><p class="sidebar-quote">"Small steps today, big savings tomorrow."</p></div>
+    </aside>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+    <div class="main-area">
+        <header class="topbar"><button type="button" id="openSidebar" class="hamburger" aria-label="Open menu" aria-controls="sidebar" aria-expanded="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg></button><div class="page-title"><h1>Loans</h1><p>Personal finance manager</p></div><div class="topbar-right"><span class="system-label">Personal database</span><div class="user-avatar" id="userAvatar" aria-hidden="true">U</div></div></header>
+        <main class="main-content loans-content">
+            <section class="loans-intro"><div><h2>Loans</h2><p>Manage your loans here!</p></div><p class="loans-month" id="loanMonthLabel"></p></section>
+            <section class="loan-summary-grid" aria-label="Loan summary">
+                <article class="loan-metric"><span>Total Outstanding</span><strong id="loanOutstanding">₱0.00</strong><small id="activeLoanCount">0 active loans</small></article>
+                <article class="loan-metric"><span>Due This Month</span><strong id="loanDueMonth">₱0.00</strong><small id="loanDueCount">0 installments due</small></article>
+                <article class="loan-metric"><span>Total Paid</span><strong id="loanTotalPaid">₱0.00</strong><small>Payment History</small></article>
+                <article class="loan-metric"><span>Overdue</span><strong id="loanOverdue">₱0.00</strong><small>Unpaid overdue installments</small></article>
+            </section>
+            <section class="loan-panel schedule-panel" aria-labelledby="scheduleTitle">
+                <div class="loan-panel-header"><div><h3 id="scheduleTitle">Due Date for the Month</h3><p>Monthly payment progress</p></div><button type="button" class="button button-secondary" id="toggleDueSchedules" aria-expanded="false">View</button></div>
+                <div class="schedule-progress"><div class="schedule-progress-values"><strong id="monthPaid">₱0.00</strong><span> / </span><span id="monthScheduled">₱0.00</span></div><div class="progress-track" role="progressbar" aria-label="Monthly payment progress" aria-valuemin="0" aria-valuemax="100" id="monthProgressTrack"><div id="monthProgressBar" class="progress-fill"></div></div><p id="monthProgressText">0% paid for this month</p></div>
+                <div id="dueSchedules" class="due-schedules" hidden></div>
+            </section>
+            <section class="loan-panel" aria-labelledby="loanListTitle"><div class="loan-panel-header"><div><h3 id="loanListTitle">List of Loans</h3><p>All registered active loans</p></div><span class="loan-list-count" id="loanListCount">0 loans</span></div><div id="loanCards" class="loan-card-grid" aria-live="polite"><p class="loan-empty">Loading your loans...</p></div></section>
+        </main>
+        <footer class="footer"><span>iSave Database Management System</span><span>Simple. Organized. Secure.</span></footer>
+    </div>
+</div>
+<div class="modal-overlay" id="loanPaymentModal" hidden><div class="transaction-modal" role="dialog" aria-modal="true" aria-labelledby="loanPaymentTitle"><div class="modal-header"><div><h2 id="loanPaymentTitle">PAYMENT FORM</h2><p>Record a payment toward this installment.</p></div><button type="button" class="modal-close" id="closeLoanPayment" aria-label="Close"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div><form id="loanPaymentForm" class="transaction-form" novalidate><div class="form-body loan-payment-fields"><div class="form-group"><label for="paymentLoanName">Name</label><input id="paymentLoanName" class="input" disabled></div><div class="form-group"><label for="paymentLoanVendor">Vendor</label><input id="paymentLoanVendor" class="input" disabled></div><div class="form-group"><label for="loanPaymentAmount">Amount</label><div class="amount-field"><span>₱</span><input id="loanPaymentAmount" class="input" type="number" min="0.01" step="0.01" inputmode="decimal" required></div><p class="field-hint" id="paymentAmountHint"></p></div><div class="form-group"><label for="paymentLoanBalance">Loan balance</label><input id="paymentLoanBalance" class="input" disabled></div><div class="form-group full-width"><label for="loanPaymentAccount">Payment account</label><select id="loanPaymentAccount" class="input" required><option value="">Loading accounts...</option></select></div></div><div class="modal-actions"><button type="button" class="button button-secondary" id="cancelLoanPayment">Cancel</button><button type="submit" class="button button-primary" id="proceedLoanPayment">Proceed</button></div></form></div></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="Script.js"></script>
+</body>
+</html>

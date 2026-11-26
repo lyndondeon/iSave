@@ -1358,9 +1358,8 @@ async function setupBanksPage() {
     const user = data.session.user;
     showUserInfo(user);
 
-    // No bank-account table exists in the current project schema. Until one is
-    // defined, keep these records local and partitioned by the authenticated user.
     const storageKey = `isave-bank-accounts:${user.id}`;
+    const migratedKey = `${storageKey}:migrated`;
     const nameInput = document.getElementById("bankName");
     const balanceInput = document.getElementById("bankBalance");
     const modal = document.getElementById("bankModal");
@@ -1370,21 +1369,11 @@ async function setupBanksPage() {
     const cancelButton = document.getElementById("cancelBank");
     const totalBalance = document.getElementById("totalBalance");
 
-    function readAccounts() {
-        try {
-            const accounts = JSON.parse(localStorage.getItem(storageKey) || "[]");
-            return Array.isArray(accounts) ? accounts.filter(function (account) {
-                return account && typeof account.name === "string" && Number.isFinite(Number(account.balance)) && Number(account.balance) >= 0;
-            }) : [];
-        } catch (storageError) {
-            logError("READ BANK ACCOUNTS", storageError);
-            return [];
-        }
-    }
-
-    function renderAccounts() {
-        const accounts = readAccounts();
-        const total = accounts.reduce(function (sum, account) { return sum + Number(account.balance); }, 0);
+    async function renderAccounts() {
+        const { data: accounts, error: accountError } = await db.from("BankAccounts")
+            .select("BankAccountID,Name,Balance").eq("UserID", user.id).order("Name");
+        if (accountError) throw accountError;
+        const total = accounts.reduce(function (sum, account) { return sum + Number(account.Balance); }, 0);
         if (totalBalance) totalBalance.textContent = formatPeso(total);
         content.replaceChildren();
 
@@ -1403,13 +1392,13 @@ async function setupBanksPage() {
             card.className = "bank-card";
             const name = document.createElement("h4");
             name.className = "bank-name";
-            name.textContent = account.name;
+            name.textContent = account.Name;
             const label = document.createElement("p");
             label.className = "bank-balance-label";
             label.textContent = "Available balance";
             const balance = document.createElement("p");
             balance.className = "bank-balance";
-            balance.textContent = formatPeso(Number(account.balance));
+            balance.textContent = formatPeso(Number(account.Balance));
             card.append(name, label, balance);
             grid.appendChild(card);
         });
@@ -1447,20 +1436,241 @@ async function setupBanksPage() {
             return;
         }
 
-        const accounts = readAccounts();
-        accounts.push({ name: name, balance: balance });
         try {
-            localStorage.setItem(storageKey, JSON.stringify(accounts));
-        } catch (storageError) {
-            logError("SAVE BANK ACCOUNT", storageError);
-            await showMessage("error", "Account not saved", "Your browser could not save this account. Check available storage and try again.");
-            return;
+            const { error: saveError } = await db.from("BankAccounts").insert({ Name: name, Balance: balance });
+            if (saveError) throw saveError;
+            closeModal();
+            await renderAccounts();
+        } catch (saveError) {
+            logError("SAVE BANK ACCOUNT", saveError);
+            await showMessage("error", "Account not saved", saveError.message || "The account could not be saved.");
         }
-        closeModal();
-        renderAccounts();
     });
 
-    renderAccounts();
+    try {
+        // Move this browser's legacy accounts once, preserving their balances.
+        if (!localStorage.getItem(migratedKey)) {
+            const legacy = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            if (Array.isArray(legacy) && legacy.length) {
+                const { error: migrationError } = await db.from("BankAccounts").insert(legacy.filter(account => account && typeof account.name === "string" && Number.isFinite(Number(account.balance)) && Number(account.balance) >= 0).map(account => ({ Name: account.name.trim(), Balance: Number(account.balance) })));
+                if (migrationError) throw migrationError;
+            }
+            localStorage.setItem(migratedKey, "true");
+        }
+        await renderAccounts();
+    } catch (loadError) {
+        logError("LOAD BANK ACCOUNTS", loadError);
+        content.textContent = "Unable to load bank accounts. Apply Database/loans_migration.sql and try again.";
+    }
+}
+
+// -----------------------------------------------------
+// 6J. Loans page
+// -----------------------------------------------------
+
+async function setupLoansPage() {
+
+    const loanCards = document.getElementById("loanCards");
+    if (!loanCards) return;
+
+    setupSidebar();
+    setupLogout();
+
+    const { data: sessionData, error: sessionError } = await db.auth.getSession();
+    if (sessionError) throw sessionError;
+    if (!sessionData.session) {
+        window.location.replace("index.html");
+        return;
+    }
+
+    const user = sessionData.session.user;
+    showUserInfo(user);
+    const monthStart = new Date();
+    monthStart.setDate(1);
+    monthStart.setHours(0, 0, 0, 0);
+    const nextMonth = new Date(monthStart.getFullYear(), monthStart.getMonth() + 1, 1);
+    const dateKey = date => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+    const monthLabel = new Intl.DateTimeFormat("en-PH", { month: "long", year: "numeric" }).format(monthStart);
+    document.getElementById("loanMonthLabel").textContent = monthLabel;
+    document.getElementById("scheduleTitle").textContent = `Due Date for the Month of ${monthLabel}`;
+
+    const modal = document.getElementById("loanPaymentModal");
+    const paymentForm = document.getElementById("loanPaymentForm");
+    const amountInput = document.getElementById("loanPaymentAmount");
+    const accountSelect = document.getElementById("loanPaymentAccount");
+    const proceedButton = document.getElementById("proceedLoanPayment");
+    let selectedSchedule = null;
+    let loans = [];
+    let schedules = [];
+    let payments = [];
+    let accounts = [];
+
+    function money(value) { return formatPeso(Math.max(0, Number(value) || 0)); }
+    function schedulePaid(scheduleId) {
+        return payments.filter(payment => payment.ScheduleID === scheduleId).reduce((sum, payment) => sum + Number(payment.Amount), 0);
+    }
+    function loanPaid(loanId) {
+        return payments.filter(payment => payment.LoanID === loanId).reduce((sum, payment) => sum + Number(payment.Amount), 0);
+    }
+    function scheduleRemaining(schedule) { return Math.max(0, Number(schedule.AmountDue) - schedulePaid(schedule.ScheduleID)); }
+    function loanRemaining(loan) { return Math.max(0, Number(loan.OriginalAmount) - loanPaid(loan.LoanID)); }
+
+    function renderDueSchedules() {
+        const holder = document.getElementById("dueSchedules");
+        holder.replaceChildren();
+        const monthSchedules = schedules.filter(schedule => schedule.DueDate >= dateKey(monthStart) && schedule.DueDate < dateKey(nextMonth))
+            .sort((a, b) => a.DueDate.localeCompare(b.DueDate));
+        if (!monthSchedules.length) {
+            const empty = document.createElement("p"); empty.className = "loan-empty"; empty.textContent = "No payment schedules are due this month."; holder.appendChild(empty); return;
+        }
+        monthSchedules.forEach(schedule => {
+            const loan = loans.find(item => item.LoanID === schedule.LoanID);
+            if (!loan) return;
+            const remaining = scheduleRemaining(schedule);
+            const row = document.createElement("article"); row.className = "due-schedule-row";
+            const details = document.createElement("div"); details.className = "due-schedule-details";
+            const due = document.createElement("strong"); due.textContent = formatDate(schedule.DueDate);
+            const name = document.createElement("span"); name.className = "due-loan-name"; name.textContent = loan.Name;
+            const vendor = document.createElement("small"); vendor.textContent = `Vendor: ${loan.Vendor}`;
+            details.append(due, name, vendor);
+            const amount = document.createElement("div"); amount.className = "due-schedule-amount";
+            const value = document.createElement("strong"); value.textContent = money(remaining);
+            const status = document.createElement("small"); status.textContent = remaining <= 0 ? "Paid" : (remaining < Number(schedule.AmountDue) ? "Partially paid" : "Unpaid");
+            amount.append(value, status);
+            row.append(details, amount);
+            if (remaining > 0) {
+                const pay = document.createElement("button"); pay.type = "button"; pay.className = "button button-primary due-pay-button"; pay.textContent = "Pay";
+                pay.addEventListener("click", () => openPayment(schedule, loan)); row.appendChild(pay);
+            }
+            holder.appendChild(row);
+        });
+    }
+
+    function renderLoanCards() {
+        loanCards.replaceChildren();
+        const activeLoans = loans.filter(loan => loan.Status === "active").sort((a, b) => String(a.Name).localeCompare(String(b.Name)));
+        document.getElementById("loanListCount").textContent = `${activeLoans.length} ${activeLoans.length === 1 ? "loan" : "loans"}`;
+        if (!activeLoans.length) {
+            const empty = document.createElement("div"); empty.className = "loan-empty";
+            empty.textContent = "You don't have any active loans yet."; loanCards.appendChild(empty); return;
+        }
+        activeLoans.forEach(loan => {
+            const original = Number(loan.OriginalAmount) || 0;
+            const paid = loanPaid(loan.LoanID);
+            const remaining = loanRemaining(loan);
+            const percent = original > 0 ? Math.max(0, Math.min(100, paid / original * 100)) : 0;
+            const card = document.createElement("article"); card.className = "loan-card";
+            const header = document.createElement("div"); header.className = "loan-card-heading";
+            const title = document.createElement("h4"); title.textContent = loan.Name;
+            const type = document.createElement("span"); type.className = "loan-type-pill"; type.textContent = loan.Type;
+            header.append(title, type);
+            const vendor = document.createElement("p"); vendor.className = "loan-vendor"; vendor.textContent = loan.Vendor;
+            const label = document.createElement("small"); label.className = "loan-balance-label"; label.textContent = "Remaining balance";
+            const balance = document.createElement("strong"); balance.className = "loan-balance-value"; balance.textContent = money(remaining);
+            const track = document.createElement("div"); track.className = "progress-track"; track.setAttribute("role", "progressbar"); track.setAttribute("aria-valuemin", "0"); track.setAttribute("aria-valuemax", "100"); track.setAttribute("aria-valuenow", percent.toFixed(1));
+            const fill = document.createElement("div"); fill.className = "progress-fill"; fill.style.width = `${percent}%`; track.appendChild(fill);
+            const percentLabel = document.createElement("p"); percentLabel.className = "loan-percent-label"; percentLabel.textContent = `${percent.toFixed(1)}% paid`;
+            const amounts = document.createElement("div"); amounts.className = "loan-card-amounts";
+            const paidText = document.createElement("span"); paidText.textContent = `Paid: ${money(paid)}`;
+            const originalText = document.createElement("span"); originalText.textContent = `Original: ${money(original)}`;
+            amounts.append(paidText, originalText); card.append(header, vendor, label, balance, track, percentLabel, amounts); loanCards.appendChild(card);
+        });
+    }
+
+    function renderSummary() {
+        const activeLoans = loans.filter(loan => loan.Status === "active");
+        const nowKey = dateKey(new Date());
+        const thisMonth = schedules.filter(schedule => schedule.DueDate >= dateKey(monthStart) && schedule.DueDate < dateKey(nextMonth));
+        const totalDue = thisMonth.reduce((sum, schedule) => sum + Number(schedule.AmountDue), 0);
+        const amountPaid = thisMonth.reduce((sum, schedule) => sum + Math.min(Number(schedule.AmountDue), schedulePaid(schedule.ScheduleID)), 0);
+        const overdue = schedules.filter(schedule => schedule.DueDate < nowKey).reduce((sum, schedule) => sum + scheduleRemaining(schedule), 0);
+        const outstanding = activeLoans.reduce((sum, loan) => sum + loanRemaining(loan), 0);
+        const paidAll = payments.reduce((sum, payment) => sum + Number(payment.Amount), 0);
+        const progress = totalDue > 0 ? Math.max(0, Math.min(100, amountPaid / totalDue * 100)) : 0;
+        document.getElementById("loanOutstanding").textContent = money(outstanding);
+        document.getElementById("activeLoanCount").textContent = `${activeLoans.length} active ${activeLoans.length === 1 ? "loan" : "loans"}`;
+        document.getElementById("loanDueMonth").textContent = money(totalDue);
+        document.getElementById("loanDueCount").textContent = `${thisMonth.length} ${thisMonth.length === 1 ? "installment" : "installments"} due this month`;
+        document.getElementById("loanTotalPaid").textContent = money(paidAll);
+        document.getElementById("loanOverdue").textContent = money(overdue);
+        document.getElementById("monthPaid").textContent = money(amountPaid);
+        document.getElementById("monthScheduled").textContent = money(totalDue);
+        document.getElementById("monthProgressBar").style.width = `${progress}%`;
+        document.getElementById("monthProgressTrack").setAttribute("aria-valuenow", progress.toFixed(1));
+        document.getElementById("monthProgressText").textContent = totalDue > 0 ? `${progress.toFixed(0)}% paid for this month` : "No payments due this month";
+    }
+
+    async function refreshLoans() {
+        const [loanResult, scheduleResult, paymentResult, accountResult] = await Promise.all([
+            db.from("Loans").select("LoanID,Name,Type,Vendor,OriginalAmount,Status").eq("UserID", user.id),
+            db.from("LoanPaymentSchedules").select("ScheduleID,LoanID,DueDate,AmountDue").eq("UserID", user.id),
+            db.from("LoanPayments").select("PaymentID,LoanID,ScheduleID,Amount,PaymentDate").eq("UserID", user.id),
+            db.from("BankAccounts").select("BankAccountID,Name,Balance").eq("UserID", user.id).order("Name")
+        ]);
+        for (const result of [loanResult, scheduleResult, paymentResult, accountResult]) if (result.error) throw result.error;
+        loans = loanResult.data || []; schedules = scheduleResult.data || []; payments = paymentResult.data || []; accounts = accountResult.data || [];
+        renderSummary(); renderDueSchedules(); renderLoanCards();
+    }
+
+    function openPayment(schedule, loan) {
+        selectedSchedule = schedule;
+        const installmentRemaining = scheduleRemaining(schedule);
+        document.getElementById("paymentLoanName").value = loan.Name;
+        document.getElementById("paymentLoanVendor").value = loan.Vendor;
+        document.getElementById("paymentLoanBalance").value = money(loanRemaining(loan));
+        document.getElementById("paymentAmountHint").textContent = `Remaining installment: ${money(installmentRemaining)}`;
+        amountInput.value = installmentRemaining.toFixed(2);
+        amountInput.max = Math.min(installmentRemaining, loanRemaining(loan)).toFixed(2);
+        accountSelect.replaceChildren();
+        const placeholder = document.createElement("option"); placeholder.value = ""; placeholder.textContent = accounts.length ? "Select payment account" : "Add a bank or e-wallet first"; accountSelect.appendChild(placeholder);
+        accounts.forEach(account => { const option = document.createElement("option"); option.value = account.BankAccountID; option.textContent = `${account.Name} (${money(account.Balance)})`; accountSelect.appendChild(option); });
+        accountSelect.disabled = accounts.length === 0;
+        modal.hidden = false; document.body.classList.add("no-scroll"); amountInput.focus();
+    }
+
+    function closePayment() { modal.hidden = true; document.body.classList.remove("no-scroll"); selectedSchedule = null; }
+    document.getElementById("toggleDueSchedules").addEventListener("click", event => {
+        const panel = document.getElementById("dueSchedules"); panel.hidden = !panel.hidden;
+        event.currentTarget.setAttribute("aria-expanded", String(!panel.hidden)); event.currentTarget.textContent = panel.hidden ? "View" : "Hide";
+    });
+    document.getElementById("closeLoanPayment").addEventListener("click", closePayment);
+    document.getElementById("cancelLoanPayment").addEventListener("click", closePayment);
+    document.addEventListener("keydown", event => { if (event.key === "Escape" && !modal.hidden && !isMessageOpen()) closePayment(); });
+    paymentForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        const amount = Number(amountInput.value);
+        if (!selectedSchedule || scheduleRemaining(selectedSchedule) <= 0) { await showMessage("warning", "Installment unavailable", "Choose an unpaid installment and try again."); return; }
+        const loan = loans.find(item => item.LoanID === selectedSchedule.LoanID);
+        const account = accounts.find(item => item.BankAccountID === accountSelect.value);
+        const maxAmount = Math.min(scheduleRemaining(selectedSchedule), loan ? loanRemaining(loan) : 0);
+        if (!loan || !account || !Number.isFinite(amount) || amount <= 0 || amount > maxAmount) { await showMessage("warning", "Check payment details", "Select a payment account and enter an amount within the remaining installment and loan balance."); return; }
+        setButtonLoading(proceedButton, true, "Processing...");
+        try {
+            const { data: authData, error: authError } = await db.auth.getUser();
+            if (authError || authData.user?.id !== user.id) throw new Error("Your login session changed. Please sign in again.");
+            const { error } = await db.rpc("record_loan_payment", { p_schedule_id: selectedSchedule.ScheduleID, p_bank_account_id: account.BankAccountID, p_amount: amount });
+            if (error) throw error;
+            setButtonLoading(proceedButton, false);
+            closePayment();
+            let refreshed = true;
+            try { await refreshLoans(); }
+            catch (refreshError) { refreshed = false; logError("REFRESH LOANS AFTER PAYMENT", refreshError); }
+            await showMessage("success", "Payment recorded", refreshed
+                ? "Your loan payment and account transaction have been saved."
+                : "Your payment was saved, but the page could not refresh the latest balances. Refresh the page to reload them.");
+        } catch (error) {
+            logError("RECORD LOAN PAYMENT", error);
+            setButtonLoading(proceedButton, false);
+            await showMessage("error", "Payment not recorded", error.message || "The payment could not be saved. No balances were changed.");
+        }
+    });
+    document.getElementById("loanCards").innerHTML = '<p class="loan-empty">Loading your loans...</p>';
+    try { await refreshLoans(); }
+    catch (error) {
+        logError("LOAD LOANS", error);
+        loanCards.textContent = "Unable to load loan data. Apply Database/loans_migration.sql and check your Supabase policies.";
+    }
+
 }
 
 
@@ -1476,5 +1686,6 @@ document.addEventListener("DOMContentLoaded", function () {
     setupCreateAccount();
     setupDashboard();
     setupBanksPage();
+    setupLoansPage();
 
 });

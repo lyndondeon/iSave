@@ -578,6 +578,71 @@ svg {
 .banks-empty-state h4 { font-size: 17px; font-weight: 800; }
 .banks-empty-state p { max-width: 430px; margin-top: 5px; color: var(--text-secondary); font-size: 13px; }
 
+/* =====================================================
+   LOANS
+   ===================================================== */
+.loans-content { align-content: start; }
+.loans-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.loans-intro h2 { font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
+.loans-intro p { color: var(--text-secondary); font-size: 14px; }
+.loans-intro .loans-month { color: var(--brand-dark); font-size: 13px; font-weight: 700; }
+.loan-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.loan-metric { min-width: 0; padding: 20px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); }
+.loan-metric > span { color: var(--text-secondary); font-size: 12px; font-weight: 600; }
+.loan-metric strong { display: block; margin: 7px 0 4px; overflow-wrap: anywhere; font-size: clamp(20px, 2.3vw, 27px); font-weight: 800; font-variant-numeric: tabular-nums; }
+.loan-metric small { color: var(--text-secondary); font-size: 12px; }
+.loan-panel { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); }
+.loan-panel-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 22px 24px; border-bottom: 1px solid var(--border); }
+.loan-panel-header h3 { font-size: 18px; font-weight: 800; }
+.loan-panel-header p { color: var(--text-secondary); font-size: 13px; }
+.schedule-progress { padding: 22px 24px 24px; }
+.schedule-progress-values { margin-bottom: 12px; font-size: 14px; font-variant-numeric: tabular-nums; }
+.schedule-progress-values strong { font-size: 20px; }
+.schedule-progress-values > span:last-child { color: var(--text-secondary); }
+.progress-track { height: 9px; overflow: hidden; border-radius: 999px; background: var(--brand-tint); }
+.progress-fill { height: 100%; border-radius: inherit; background: var(--primary); transition: width .25s ease; }
+.schedule-progress > p, .loan-percent-label { margin-top: 8px; color: var(--text-secondary); font-size: 12px; }
+.due-schedules { border-top: 1px solid var(--border); }
+.due-schedule-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 20px; padding: 17px 24px; border-bottom: 1px solid var(--border); }
+.due-schedule-row:last-child { border-bottom: 0; }
+.due-schedule-details { display: grid; grid-template-columns: minmax(100px, .55fr) minmax(140px, 1fr) minmax(140px, .8fr); align-items: center; gap: 12px; min-width: 0; }
+.due-schedule-details strong { white-space: nowrap; font-size: 13px; }
+.due-loan-name { overflow-wrap: anywhere; font-weight: 700; }
+.due-schedule-details small, .due-schedule-amount small { color: var(--text-secondary); font-size: 12px; }
+.due-schedule-amount { display: grid; justify-items: end; gap: 3px; white-space: nowrap; }
+.due-pay-button { padding: 8px 15px; }
+.loan-list-count { color: var(--text-secondary); font-size: 13px; }
+.loan-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 16px; padding: 24px; }
+.loan-card { min-width: 0; padding: 20px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--surface); }
+.loan-card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.loan-card-heading h4 { overflow-wrap: anywhere; font-size: 16px; font-weight: 800; }
+.loan-type-pill { flex-shrink: 0; padding: 4px 9px; border-radius: 999px; background: var(--brand-tint); color: var(--brand-dark); font-size: 10px; font-weight: 700; }
+.loan-vendor { margin-top: 5px; color: var(--text-secondary); font-size: 12px; }
+.loan-balance-label { display: block; margin-top: 20px; color: var(--text-secondary); font-size: 12px; }
+.loan-balance-value { display: block; margin: 3px 0 14px; overflow-wrap: anywhere; font-size: 23px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.loan-card-amounts { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 14px; color: var(--text-secondary); font-size: 11px; }
+.loan-empty { grid-column: 1 / -1; padding: 32px 20px; color: var(--text-secondary); text-align: center; }
+.loan-payment-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+@media (max-width: 960px) {
+    .loan-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .due-schedule-details { grid-template-columns: 1fr; gap: 3px; }
+}
+@media (max-width: 720px) {
+    .loans-intro { align-items: flex-start; flex-direction: column; }
+    .loans-intro h2 { font-size: 23px; }
+    .loan-summary-grid { gap: 10px; }
+    .loan-metric { padding: 15px; }
+    .loan-panel-header { padding: 18px 16px; }
+    .schedule-progress { padding: 18px 16px; }
+    .due-schedule-row { grid-template-columns: minmax(0, 1fr) auto; gap: 12px; padding: 15px 16px; }
+    .due-schedule-details { grid-column: 1; }
+    .due-schedule-amount { grid-column: 2; grid-row: 1; }
+    .due-pay-button { grid-column: 1 / -1; width: 100%; }
+    .loan-card-grid { padding: 16px; }
+    .loan-payment-fields { grid-template-columns: 1fr; }
+}
+
 .transactions-header {
     display: flex;
     align-items: center;
