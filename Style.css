@@ -583,6 +583,7 @@ svg {
    ===================================================== */
 .loans-content { align-content: start; }
 .loans-intro { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.loans-intro-actions { display: flex; align-items: center; gap: 14px; }
 .loans-intro h2 { font-size: 26px; font-weight: 800; letter-spacing: -.5px; }
 .loans-intro p { color: var(--text-secondary); font-size: 14px; }
 .loans-intro .loans-month { color: var(--brand-dark); font-size: 13px; font-weight: 700; }
@@ -623,6 +624,10 @@ svg {
 .loan-card-amounts { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 14px; color: var(--text-secondary); font-size: 11px; }
 .loan-empty { grid-column: 1 / -1; padding: 32px 20px; color: var(--text-secondary); text-align: center; }
 .loan-payment-fields { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.loan-card-pay { width: 100%; margin-top: 16px; }
+.form-group[hidden] { display: none; }
+.type-form-body { grid-template-columns: 1fr; }
+select.input option:disabled { color: #a5b0a7; }
 
 @media (max-width: 960px) {
     .loan-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -630,6 +635,7 @@ svg {
 }
 @media (max-width: 720px) {
     .loans-intro { align-items: flex-start; flex-direction: column; }
+    .loans-intro-actions { width: 100%; justify-content: space-between; }
     .loans-intro h2 { font-size: 23px; }
     .loan-summary-grid { gap: 10px; }
     .loan-metric { padding: 15px; }

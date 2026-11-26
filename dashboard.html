@@ -274,7 +274,7 @@
         <!-- Modal header -->
         <div class="modal-header">
             <div>
-                <h2 id="transactionModalTitle">Add transaction</h2>
+                <h2 id="transactionModalTitle">Bank Transfer</h2>
                 <p>Fill in the details of your transaction.</p>
             </div>
 
@@ -389,6 +389,48 @@
 
     </div>
 
+</div>
+
+<div class="modal-overlay" id="transactionTypeModal" hidden>
+    <div class="transaction-modal transaction-type-modal" role="dialog" aria-modal="true" aria-labelledby="transactionTypeTitle">
+        <div class="modal-header">
+            <div><h2 id="transactionTypeTitle">Transaction Type</h2><p>Choose the transaction you want to record.</p></div>
+            <button type="button" class="modal-close" id="closeTransactionTypeModal" aria-label="Close">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+            </button>
+        </div>
+        <form id="transactionTypeForm" class="transaction-form">
+            <div class="form-body type-form-body">
+                <div class="form-group full-width">
+                    <label for="transactionTypeChoice">Transaction Type</label>
+                    <select id="transactionTypeChoice" class="input" required>
+                        <option value="" selected disabled>Select transaction type</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Loan">Loan</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-actions"><button type="button" class="button button-secondary" id="cancelTransactionType">Cancel</button><button type="submit" class="button button-primary">Continue</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="loanPaymentModal" hidden>
+    <div class="transaction-modal" role="dialog" aria-modal="true" aria-labelledby="loanPaymentTitle">
+        <div class="modal-header"><div><h2 id="loanPaymentTitle">Pay Loan</h2><p>Record a payment toward your loan.</p></div><button type="button" class="modal-close" id="closeLoanPayment" aria-label="Close"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg></button></div>
+        <form id="loanPaymentForm" class="transaction-form" novalidate>
+            <div class="form-body loan-payment-fields">
+                <div class="form-group"><div class="date-label-row"><label for="loanPaymentDate">Date</label><label class="toggle"><input type="checkbox" id="loanPaymentTodayToggle" checked><span class="toggle-track" aria-hidden="true"></span>Today</label></div><input id="loanPaymentDate" class="input" type="date" disabled required><p class="field-hint" id="loanPaymentDateHint">Using today's date.</p></div>
+                <div class="form-group"><label for="payInAccount">Pay In</label><select id="payInAccount" class="input" required><option value="">Loading accounts...</option></select></div>
+                <div class="form-group full-width"><label for="paymentLoanSelect">Vendor</label><select id="paymentLoanSelect" class="input" required><option value="">Select a loan</option></select></div>
+                <div class="form-group" id="paymentMonthGroup"><label for="paymentMonthSelect">Month of Payment</label><select id="paymentMonthSelect" class="input"><option value="">Select a month</option></select></div>
+                <div class="form-group"><div class="date-label-row"><label for="loanPaymentAmount">Amount</label><label class="toggle"><input type="checkbox" id="autoPaymentToggle"><span class="toggle-track" aria-hidden="true"></span>Use amount due</label></div><div class="amount-field"><span aria-hidden="true">₱</span><input id="loanPaymentAmount" class="input" type="number" min="0.01" step="0.01" inputmode="decimal" required></div><p class="field-hint" id="paymentAmountHint"></p></div>
+                <div class="form-group"><label for="paymentLoanBalance">Remaining loan balance</label><input id="paymentLoanBalance" class="input" disabled></div>
+                <div class="form-group full-width"><label for="loanAdjustment">Penalty / Adjustment</label><input id="loanAdjustment" class="input" value="₱0.00" disabled><p class="field-hint">No adjustment is applied. Payments reduce the loan by the amount paid.</p></div>
+            </div>
+            <div class="modal-actions"><button type="button" class="button button-secondary" id="cancelLoanPayment">Cancel</button><button type="submit" class="button button-primary" id="proceedLoanPayment">Record Payment</button></div>
+        </form>
+    </div>
 </div>
 
 
