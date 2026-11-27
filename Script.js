@@ -872,6 +872,17 @@ function formatPayroll(value) {
 
 }
 
+// Dates 26–10 belong to the first cutoff; dates 11–25 belong to the second.
+function getPayrollForDate(value) {
+    if (!value) return null;
+    const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+    if (!match) return null;
+    const date = new Date(Number(match[1]), Number(match[2]) - 1, Number(match[3]));
+    if (date.getFullYear() !== Number(match[1]) || date.getMonth() !== Number(match[2]) - 1 || date.getDate() !== Number(match[3])) return null;
+    const day = date.getDate();
+    return day >= 26 || day <= 10 ? 1 : 2;
+}
+
 // Today's date as "YYYY-MM-DD" in local time
 // (toISOString() uses UTC, which can be a day behind in the Philippines)
 function getTodayDate() {
@@ -1086,7 +1097,6 @@ function validateTransaction(transaction) {
 
     const requiredFields = [
         { fieldId: "transactionDate", value: transaction.date,     name: "date" },
-        { fieldId: "payroll",         value: transaction.payroll,  name: "payroll" },
         { fieldId: "sender",          value: transaction.sender,   name: "sender" },
         { fieldId: "receiver",        value: transaction.receiver, name: "receiver" },
         { fieldId: "amount",          value: transaction.amount,   name: "amount" },
@@ -1192,7 +1202,7 @@ function setupTransactionModal(tableBody, userId, openLoanPayment) {
         updateDateField();
         modal.hidden = false;
         document.body.classList.add("no-scroll");
-        focusField("payroll");
+        focusField("sender");
     }
 
     function closeModal() {
@@ -1249,7 +1259,7 @@ function setupTransactionModal(tableBody, userId, openLoanPayment) {
         // STEP 1: Read the form
         const transaction = {
             date: dateInput.value,
-            payroll: getValue("payroll"),
+            payroll: getPayrollForDate(dateInput.value),
             sender: getValue("sender"),
             receiver: getValue("receiver"),
             amount: getValue("amount"),
@@ -1289,7 +1299,7 @@ function setupTransactionModal(tableBody, userId, openLoanPayment) {
             // (left side = column name in the database)
             const { error } = await db.from("Transactions").insert({
                 Date: transaction.date,
-                Payroll: Number(transaction.payroll),
+                Payroll: transaction.payroll,
                 Sender: transaction.sender,
                 Amount: Number(transaction.amount),
                 Reciever: transaction.receiver,
@@ -1860,11 +1870,27 @@ function setupAddLoanModal(userId, afterSave) {
     const nameInput = document.getElementById("newLoanName");
     const vendorInput = document.getElementById("newLoanVendor");
     const amountInput = document.getElementById("newLoanAmount");
+    const interestRateInput = document.getElementById("newLoanInterestRate");
     const monthlyAmountInput = document.getElementById("newLoanMonthlyAmount");
     const loanDateInput = document.getElementById("newLoanDate");
     const durationInput = document.getElementById("newLoanDuration");
     const monthlyRequiredInput = document.getElementById("newLoanMonthlyRequired");
     const saveButton = document.getElementById("saveLoanButton");
+
+    function updateMonthlyAmount() {
+        const amount = Number(amountInput.value);
+        const rate = Number(interestRateInput.value);
+        const months = Number(durationInput.value);
+        if (!amountInput.value || !interestRateInput.value || !durationInput.value
+            || !Number.isFinite(amount) || amount <= 0 || !Number.isFinite(rate) || rate < 0
+            || !Number.isInteger(months) || months <= 0) {
+            monthlyAmountInput.value = "";
+            return;
+        }
+        const monthlyInterest = amount * (rate / 100);
+        const totalLoan = amount + monthlyInterest * months;
+        monthlyAmountInput.value = (Math.round((totalLoan / months) * 100) / 100).toFixed(2);
+    }
 
     function updateMonthlyRequirement() {
         monthlyAmountInput.required = monthlyRequiredInput.value === "yes";
@@ -1879,6 +1905,8 @@ function setupAddLoanModal(userId, afterSave) {
     openButton.addEventListener("click", function () {
         form.reset();
         monthlyRequiredInput.value = "yes";
+        interestRateInput.value = "0";
+        updateMonthlyAmount();
         updateMonthlyRequirement();
         modal.hidden = false;
         document.body.classList.add("no-scroll");
@@ -1887,6 +1915,7 @@ function setupAddLoanModal(userId, afterSave) {
     document.getElementById("closeAddLoan").addEventListener("click", closeModal);
     document.getElementById("cancelAddLoan").addEventListener("click", closeModal);
     monthlyRequiredInput.addEventListener("change", updateMonthlyRequirement);
+    [amountInput, interestRateInput, durationInput].forEach(input => input.addEventListener("input", updateMonthlyAmount));
     document.addEventListener("keydown", function (event) {
         if (event.key === "Escape" && !modal.hidden && !isMessageOpen()) closeModal();
     });
@@ -1896,7 +1925,9 @@ function setupAddLoanModal(userId, afterSave) {
         const name = nameInput.value.trim();
         const vendor = vendorInput.value.trim();
         const originalAmount = Number(amountInput.value);
+        const interestRate = Number(interestRateInput.value);
         const monthlyRequired = monthlyRequiredInput.value === "yes";
+        updateMonthlyAmount();
         const monthlyAmountValue = monthlyAmountInput.value.trim();
         const monthlyAmount = monthlyAmountValue ? Number(monthlyAmountValue) : null;
         const duration = Number(durationInput.value);
@@ -1913,6 +1944,10 @@ function setupAddLoanModal(userId, afterSave) {
         }
         if (!Number.isFinite(originalAmount) || originalAmount <= 0 || Math.abs(originalAmount * 100 - Math.round(originalAmount * 100)) > 0.000001) {
             await showFormProblem({ fieldId: "newLoanAmount", title: "Invalid loan amount", message: "Enter an amount greater than zero with no more than two decimal places." }, "warning");
+            return;
+        }
+        if (!interestRateInput.value || !Number.isFinite(interestRate) || interestRate < 0) {
+            await showFormProblem({ fieldId: "newLoanInterestRate", title: "Invalid interest rate", message: "Enter an interest rate of zero or greater." }, "warning");
             return;
         }
         if (monthlyRequired && (!Number.isFinite(monthlyAmount) || monthlyAmount <= 0
